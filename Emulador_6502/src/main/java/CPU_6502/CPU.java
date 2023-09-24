@@ -60,17 +60,18 @@ public class CPU {
 
 	private void LDASetStatus() {
 		Z = (A == 0);
-		N = (A & 0b100000000) > 0;
+		N = (A & 0b10000000) > 0;
 	}
 
 	private void LDXSetStatus() {
 		Z = (X == 0);
-		N = (X & 0b100000000) > 0;
+		N = (X & 0b10000000) > 0;
 	}
 
-	public void execute(int ciclos, Mem mem) {
+	public int execute(int ciclos, Mem mem) {
 		CPU.ciclos = ciclos;
 		CPU.mem = mem;
+		final int ciclosPedidos = CPU.ciclos;
 		while (CPU.ciclos > 0) {
 
 			int ins = FetchByte(CPU.ciclos, CPU.mem);
@@ -88,13 +89,22 @@ public class CPU {
 			}
 			case INS_LDA_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				if(ZeroPageAddr>=256) {
+					ZeroPageAddr-=256;
+				}
+				
 				A = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
+				System.out.println(A);
 				LDASetStatus();
 				break;
 			}
 			case INS_LDA_ZX: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
+				if(ZeroPageAddr>256) {
+					ZeroPageAddr-=256;
+				}
+				System.out.println(ZeroPageAddr);
 				CPU.ciclos--;
 				A = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
 				LDASetStatus();
@@ -117,10 +127,10 @@ public class CPU {
 				System.out.println("Instruccion no especificada");
 				break;
 			}
+			
 
-			CPU.ciclos--;
 		}
-
+		return ciclosPedidos - CPU.ciclos;
 	}
 
 	public int FetchWord(int ciclos, Mem mem) {

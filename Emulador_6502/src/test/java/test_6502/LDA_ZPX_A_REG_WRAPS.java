@@ -1,4 +1,5 @@
 package test_6502;
+
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -9,13 +10,10 @@ import org.junit.Test;
 
 import CPU_6502.CPU;
 
-
-
-
-
-public class CPUTest_1 {
+public class LDA_ZPX_A_REG_WRAPS {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -26,8 +24,7 @@ public class CPUTest_1 {
 
 	@Before
 	public void setUp() throws Exception {
-		
-	
+
 	}
 
 	@After
@@ -36,19 +33,30 @@ public class CPUTest_1 {
 
 	@Test
 	public void test() {
-		
+
 		cpu.reset(mem);
+		// Escribo en X para comprobar que si escriba en X
+		CPU copiaCPU = cpu;
+
+		cpu.X = 0xFF;
+
+		CPU.mem.data[0xFFFC] = CPU.INS_LDA_ZX;
+		CPU.mem.data[0xFFFD] = 0x80;
+		CPU.mem.data[0x007F] = 0x37;
+
+		int ciclosUsados = cpu.execute(4, mem);
 		
-		CPU.mem.data[0xFFFC] = CPU.INS_JSR;
-		CPU.mem.data[0xFFFD] = 0x42;
-		CPU.mem.data[0xFFFE] = 0x42;
-		CPU.mem.data[0x4242] =CPU.INS_LDA_IM;
-		CPU.mem.data[0x4243] = 0x84;
-		
-		
-		cpu.execute(9, mem);
-		assertEquals(cpu.A, 132);
-		// Ya funciona y listo para implementar mas
+		assertEquals(cpu.A, 0x37);
+		assertEquals(ciclosUsados, 4);
+			
+		assertEquals(cpu.Z, false);
+		assertEquals(cpu.N, false);
+
+		assertEquals(cpu.C, copiaCPU.C);
+		assertEquals(cpu.I, copiaCPU.I);
+		assertEquals(cpu.D, copiaCPU.D);
+		assertEquals(cpu.B, copiaCPU.B);
+		assertEquals(cpu.V, copiaCPU.V);
 	}
 
 }
