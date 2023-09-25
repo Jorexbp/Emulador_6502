@@ -35,7 +35,7 @@ public class CPU {
 
 	public final static int INS_LDX_IM = 0xA2;
 
-	public final static int INS_JSR = 0x0;
+	public final static int INS_JSR = 0x20;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -84,15 +84,14 @@ public class CPU {
 				A = val;
 				LDASetStatus();
 
-				// System.out.println(A);
 				break;
 			}
 			case INS_LDA_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
-				if(ZeroPageAddr>=256) {
-					ZeroPageAddr-=256;
+				if (ZeroPageAddr >= 256) {
+					ZeroPageAddr -= 256;
 				}
-				
+
 				A = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
 				System.out.println(A);
 				LDASetStatus();
@@ -101,14 +100,45 @@ public class CPU {
 			case INS_LDA_ZX: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
-				if(ZeroPageAddr>256) {
-					ZeroPageAddr-=256;
+				if (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
 				}
 				System.out.println(ZeroPageAddr);
 				CPU.ciclos--;
 				A = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
 				LDASetStatus();
 				break;
+			}
+			case INS_LDA_AB:
+			{
+				int addrAbs = FetchWord(CPU.ciclos,CPU.mem);
+				A = readByte(CPU.ciclos, addrAbs, CPU.mem);
+				LDASetStatus();
+				break;		
+			}
+			case INS_LDA_AX:
+			{
+				int addrAbs = FetchWord(CPU.ciclos,CPU.mem);
+				int effAddrAbsX = addrAbs + X;
+				A = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
+				
+				if(effAddrAbsX - addrAbs >= 0xFF) {
+					CPU.ciclos--;
+				}
+				LDASetStatus();
+				break;		
+			}
+			case INS_LDA_AY:
+			{
+				int addrAbs = FetchWord(CPU.ciclos,CPU.mem);
+				int effAddrAbsY = addrAbs + Y;
+				A = readByte(CPU.ciclos, effAddrAbsY, CPU.mem);
+				
+				if(effAddrAbsY - addrAbs >= 0xFF) {
+					CPU.ciclos--;
+				}
+				LDASetStatus();
+				break;		
 			}
 			case INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
@@ -122,12 +152,40 @@ public class CPU {
 				int val = FetchByte(CPU.ciclos, CPU.mem);
 				X = val;
 				LDXSetStatus();
+				break;
+			}
+			case INS_LDA_IX:
+			{
+				int addrIX = FetchByte(CPU.ciclos, CPU.mem);
+				addrIX+=X;
+				while(addrIX >= 256) {
+					addrIX-=256;
+				}
+				CPU.ciclos--;
+				int effAddr = readWord(CPU.ciclos, addrIX, CPU.mem);
+				A = readByte(CPU.ciclos, effAddr, CPU.mem);
+				
+				LDASetStatus();
+				break;
+			}
+			case INS_LDA_IY:
+			{
+				int addrIY = FetchByte(CPU.ciclos, CPU.mem);
+				while(addrIY >= 256) {
+					addrIY-=256;
+				}
+				int effAddr = readWord(CPU.ciclos, addrIY, CPU.mem);
+				effAddr+=Y;
+				
+				A = readByte(CPU.ciclos, effAddr, CPU.mem);
+				
+				LDASetStatus();
+				break;
 			}
 			default:
 				System.out.println("Instruccion no especificada");
 				break;
 			}
-			
 
 		}
 		return ciclosPedidos - CPU.ciclos;
@@ -165,38 +223,44 @@ public class CPU {
 		return data;
 	}
 
+	public int readWord(int ciclos, int addr, Mem mem) {
+		int loByte = readByte(CPU.ciclos, addr, CPU.mem);
+		int hiByte = readByte(CPU.ciclos, addr + 1, CPU.mem);
+		return loByte | (hiByte << 8);
+	}
+
 	public int leerByte(int dir) {
 		return CPU.mem.data[dir];
 	}
 
 	public static void main(String[] args) throws IOException {
-		Mem mem = new Mem();
-		CPU cpu = new CPU();
-		cpu.reset(mem);
-
-		CPU.mem.data[0xFFFC] = INS_JSR;
-		CPU.mem.data[0xFFFD] = 0x42;
-		CPU.mem.data[0xFFFE] = 0x42;
-		CPU.mem.data[0x4242] = INS_LDA_IM;
-		CPU.mem.data[0x4243] = 0x84;
-
-		cpu.execute(9, mem);
-		// 31:27 s vid
-
-		String s = "";
-
-		for (int i = 0; i < CPU.mem.data.length; i++) {
-
-			if (i % 64 == 0 && i != 0) {
-				s += CPU.mem.data[i] + "\n";
-			} else if (CPU.mem.data[i] != 0) {
-				s += "|" + CPU.mem.data[i] + "|";
-			} else {
-				s += CPU.mem.data[i];
-			}
-
-		}
-		System.out.println(s.replace("||", "|"));
+//		Mem mem = new Mem();
+//		CPU cpu = new CPU();
+//		cpu.reset(mem);
+//
+//		CPU.mem.data[0xFFFC] = INS_JSR;
+//		CPU.mem.data[0xFFFD] = 0x42;
+//		CPU.mem.data[0xFFFE] = 0x42;
+//		CPU.mem.data[0x4242] = INS_LDA_IM;
+//		CPU.mem.data[0x4243] = 0x84;
+//
+//		cpu.execute(9, mem);
+//		// 31:27 s vid
+//
+//		String s = "";
+//
+//		for (int i = 0; i < CPU.mem.data.length; i++) {
+//
+//			if (i % 64 == 0 && i != 0) {
+//				s += CPU.mem.data[i] + "\n";
+//			} else if (CPU.mem.data[i] != 0) {
+//				s += "|" + CPU.mem.data[i] + "|";
+//			} else {
+//				s += CPU.mem.data[i];
+//			}
+//
+//		}
+//		System.out.println(s.replace("||", "|"));
 
 		// System.out.println(cpu.leerByte(0x01));
 		// System.out.println(cpu.mem[0x01]);
