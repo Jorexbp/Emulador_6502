@@ -1,4 +1,4 @@
-package test_6502;
+package LDX_Tests;
 
 import static org.junit.Assert.*;
 
@@ -38,11 +38,11 @@ public class LDA_IM_A_REG {
 		CPU copiaCPU = cpu;
 		
 		CPU.mem.data[0xFFFC] = CPU.INS_LDA_IM;
-		CPU.mem.data[0xFFFD] = 0x84;
+		CPU.mem.data[0xFFFD] = 0x42;
 		
 		int ciclosUsados = cpu.execute(2, mem);
 		
-		assertEquals(cpu.A, 0x84);
+		assertEquals(cpu.A, 0x42);
 		assertEquals(ciclosUsados, 2);
 		
 		

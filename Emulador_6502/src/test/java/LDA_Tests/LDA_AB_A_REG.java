@@ -1,4 +1,4 @@
-package test_6502;
+package LDA_Tests;
 
 import static org.junit.Assert.*;
 

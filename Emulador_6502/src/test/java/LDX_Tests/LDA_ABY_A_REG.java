@@ -1,4 +1,4 @@
-package test_6502;
+package LDX_Tests;
 
 import static org.junit.Assert.*;
 

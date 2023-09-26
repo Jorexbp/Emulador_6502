@@ -1,4 +1,4 @@
-package test_6502;
+package LDA_Tests;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import CPU_6502.CPU;
 
-public class LDA_ZPX_A_REG {
+public class LDA_ABX_A_REG_PAGE {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -35,28 +35,29 @@ public class LDA_ZPX_A_REG {
 	public void test() {
 
 		cpu.reset(mem);
-		// Escribo en X para comprobar que si escriba en X
+		cpu.X = 0xFF;
 		CPU copiaCPU = cpu;
 		
-		cpu.X = 5;
-
-		CPU.mem.data[0xFFFC] = CPU.INS_LDA_ZX;
-		CPU.mem.data[0xFFFD] = 0x42;
-		CPU.mem.data[0x0047] = 0x37;
-
-		int ciclosUsados = cpu.execute(4, mem);
+		CPU.mem.data[0xFFFC] = CPU.INS_LDA_AX;
+		CPU.mem.data[0xFFFD] = 0x02;
+		CPU.mem.data[0xFFFE] = 0x44;
+		CPU.mem.data[0x4501] = 0x37;
+		
+		int ciclosUsados = cpu.execute(5, mem);
 		
 		assertEquals(cpu.A, 0x37);
-		assertEquals(ciclosUsados, 4);
+		assertEquals(ciclosUsados, 5);
+		
 		
 		assertEquals(cpu.Z, false);
 		assertEquals(cpu.N, false);
-
+		
 		assertEquals(cpu.C,copiaCPU.C);
 		assertEquals(cpu.I,copiaCPU.I);
 		assertEquals(cpu.D,copiaCPU.D);
 		assertEquals(cpu.B,copiaCPU.B);
 		assertEquals(cpu.V,copiaCPU.V);
+		// Ya funciona y listo para implementar mas
 	}
 
 }
