@@ -13,7 +13,7 @@ import CPU_6502.CPU;
 public class LDA_IX_A_REG {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
-
+ 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -40,7 +40,7 @@ public class LDA_IX_A_REG {
 
 		CPU.mem.data[0xFFFC] = CPU.INS_LDA_IX;
 		CPU.mem.data[0xFFFD] = 0x02;
-		CPU.mem.data[0x0006] = 0x00;
+		CPU.mem.data[0x0006] = 0x00; // 0x02 + 0x04 (X)
 		CPU.mem.data[0x0007] = 0x80;
 		CPU.mem.data[0x8000] = 0x37;
 

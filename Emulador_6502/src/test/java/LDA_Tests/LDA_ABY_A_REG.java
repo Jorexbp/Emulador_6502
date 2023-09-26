@@ -32,16 +32,16 @@ public class LDA_ABY_A_REG {
 	}
 
 	@Test
-	public void test() {
+	public void test() { 
 
 		cpu.reset(mem);
-		cpu.Y = 0xFF;
+		CPU.Y = 0x02;
 		CPU copiaCPU = cpu;
 		
 		CPU.mem.data[0xFFFC] = CPU.INS_LDA_AY;
 		CPU.mem.data[0xFFFD] = 0x02;
 		CPU.mem.data[0xFFFE] = 0x44;
-		CPU.mem.data[0x4501] = 0x37;
+		CPU.mem.data[0x04] = 0x37;
 		
 		int ciclosUsados = cpu.execute(5, mem);
 		

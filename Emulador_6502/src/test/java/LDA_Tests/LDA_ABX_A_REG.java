@@ -13,7 +13,6 @@ import CPU_6502.CPU;
 public class LDA_ABX_A_REG {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
-
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -43,7 +42,7 @@ public class LDA_ABX_A_REG {
 		CPU.mem.data[0x84] = 0xF1;
 		
 		int ciclosUsados = cpu.execute(4, mem);
-		
+	
 		assertEquals(cpu.A, 0xF1);
 		assertEquals(ciclosUsados, 4);
 		

@@ -13,8 +13,7 @@ import CPU_6502.CPU;
 public class LDA_IY_A_REG {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
-
-	@BeforeClass
+	@BeforeClass 
 	public static void setUpBeforeClass() throws Exception {
 	}
 
