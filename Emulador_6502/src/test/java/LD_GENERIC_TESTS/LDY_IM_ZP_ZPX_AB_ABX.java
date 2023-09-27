@@ -12,7 +12,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class LDY_IM_ZP {
+public class LDY_IM_ZP_ZPX_AB_ABX {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -63,7 +63,7 @@ public class LDY_IM_ZP {
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 
-		}else if (CPU.INS_LDY_ABX == OPCODE) {
+		} else if (CPU.INS_LDY_ABX == OPCODE) {
 			assertEquals(CPU.Y, 0x10);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
