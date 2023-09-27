@@ -51,6 +51,7 @@ public class CPU {
 		Mem mem = new Mem();
 		CPU.mem = mem;
 	}
+
 	public void reset(CPU.Mem mem2) {
 		PC = 0xFFFC;
 		SP = 0x0100;
@@ -77,6 +78,11 @@ public class CPU {
 		N = (X & 0b01000000) > 0;
 	}
 
+	private void LDYSetStatus() {
+		Z = (Y == 0);
+		N = (Y & 0b01000000) > 0;
+	}
+
 	public int execute(int ciclos, Mem mem) {
 		CPU.ciclos = ciclos;
 		CPU.mem = mem;
@@ -91,6 +97,9 @@ public class CPU {
 
 				int val = FetchByte(CPU.ciclos, CPU.mem);
 
+				while (val >= 256) {
+					val -= 256;
+				}
 				A = val;
 				LDASetStatus();
 
@@ -166,7 +175,7 @@ public class CPU {
 				} // F0
 				int effAddr = readWord(CPU.ciclos, addrIY, CPU.mem);
 				effAddr += Y;
-				
+
 				A = readByte(CPU.ciclos, effAddr, CPU.mem);
 
 				LDASetStatus();
@@ -174,6 +183,9 @@ public class CPU {
 			}
 			case INS_LDX_IM: {
 				int val = FetchByte(CPU.ciclos, CPU.mem);
+				while (val >= 256) {
+					val -= 256;
+				}
 				X = val;
 				LDXSetStatus();
 				break;
@@ -212,6 +224,51 @@ public class CPU {
 					CPU.ciclos--;
 				}
 				LDXSetStatus();
+				break;
+			}
+			case INS_LDY_IM: {
+				int val = FetchByte(CPU.ciclos, CPU.mem);
+				while (val >= 256) {
+					val -= 256;
+				}
+				Y = val;
+				LDYSetStatus();
+				break;
+			}
+			case INS_LDY_ZP: {
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				while (ZeroPageAddr >= 256) {
+					ZeroPageAddr -= 256;
+				}
+				Y = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
+				LDYSetStatus();
+				break;
+			}
+			case INS_LDY_ZPX: {
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				ZeroPageAddr += X;
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+				CPU.ciclos--;
+				Y = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
+				LDYSetStatus();
+				break;
+			}
+			case INS_LDY_AB: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+				Y = readByte(CPU.ciclos, addrAbs, CPU.mem);
+				LDYSetStatus();
+				break;
+			}
+			case INS_LDY_ABX: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+				int effAddrAbsX = addrAbs + X;
+				Y = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
+				if (effAddrAbsX - addrAbs >= 0xFF) {
+					CPU.ciclos--;
+				}
+				LDYSetStatus();
 				break;
 			}
 			case INS_JSR: {
