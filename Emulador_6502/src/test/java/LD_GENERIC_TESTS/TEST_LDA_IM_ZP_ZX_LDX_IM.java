@@ -23,8 +23,8 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU.INS_LDA_IM, 2 }, { CPU.INS_LDA_ZP, 3 }, { CPU.INS_LDA_ZX, 4 },
-				{ CPU.INS_LDX_IM, 2 }};
+		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_LDA_IM, 2 }, { CPU_6502.OPCODES.INS_LDA_ZP, 3 }, { CPU_6502.OPCODES.INS_LDA_ZX, 4 },
+				{ CPU_6502.OPCODES.INS_LDX_IM, 2 }};
 		return Arrays.asList(data);
 	}
 
@@ -41,18 +41,18 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU.INS_LDA_IM == OPCODE) {
+		if (CPU_6502.OPCODES.INS_LDA_IM == OPCODE) {
 			assertEquals(CPU.A, 0x42);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_ZP == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_ZP == OPCODE) {
 			assertEquals(CPU.A, 0x37);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_ZX == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_ZX == OPCODE) {
 			// Sirve para sumar X en el caso de necesidad,
 			// por el test no lo implemente
 			assertEquals(CPU.A, 0x37);
@@ -60,7 +60,7 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDX_IM == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDX_IM == OPCODE) {
 			assertEquals(CPU.X, 0x42);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class CPU {
 	// byte[] Dbyte = new byte[8];
-//	byte[] DWord = new byte[16];
+	// byte[] DWord = new byte[16];
 
 	public int PC; // Program counter
 	public int SP; // Stack pointer
@@ -22,43 +22,6 @@ public class CPU {
 	public int D, C, I, B, V;
 	public boolean N;
 	public boolean Z;
-
-	// opcodes
-
-	// LDA OPCODES
-	public final static int INS_LDA_IM = 0xA9;
-	public final static int INS_LDA_ZP = 0xA5;
-	public final static int INS_LDA_ZX = 0xB5;
-	public final static int INS_LDA_AB = 0xAD;
-	public final static int INS_LDA_AX = 0xBD;
-	public final static int INS_LDA_AY = 0xB9;
-	public final static int INS_LDA_IX = 0xA1;
-	public final static int INS_LDA_IY = 0xB1;
-
-	// LDX OPCODES
-	public final static int INS_LDX_IM = 0xA2;
-	public final static int INS_LDX_ZP = 0xA6;
-	public final static int INS_LDX_ZPY = 0xB6;
-	public final static int INS_LDX_AB = 0xAE;
-	public final static int INS_LDX_ABY = 0xBE;
-
-	// LDY OPCODES
-	public final static int INS_LDY_IM = 0xA0;
-	public final static int INS_LDY_ZP = 0xA4;
-	public final static int INS_LDY_ZPX = 0xB4;
-	public final static int INS_LDY_AB = 0xAC;
-	public final static int INS_LDY_ABX = 0xBC;
-
-	// STA OPCODES
-	public final static int INS_STA_ZP = 0x85;
-	public final static int INS_STA_ZPX = 0x95;
-	public final static int INS_STA_AB = 0x8D;
-	public final static int INS_STA_ABX = 0x9D;
-	public final static int INS_STA_ABY = 0x99;
-	public final static int INS_STA_INX = 0x81;
-	public final static int INS_STA_INY = 0x91;
-
-	public final static int INS_JSR = 0x20;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -106,7 +69,7 @@ public class CPU {
 
 			switch (ins) {
 
-			case INS_LDA_IM: {
+			case CPU_6502.OPCODES.INS_LDA_IM: {
 
 				int val = FetchByte(CPU.ciclos, CPU.mem);
 
@@ -118,7 +81,7 @@ public class CPU {
 
 				break;
 			}
-			case INS_LDA_ZP: {
+			case CPU_6502.OPCODES.INS_LDA_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				if (ZeroPageAddr >= 256) {
 					ZeroPageAddr -= 256;
@@ -128,7 +91,7 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_ZX: {
+			case CPU_6502.OPCODES.INS_LDA_ZX: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
 
@@ -140,14 +103,14 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_AB: {
+			case CPU_6502.OPCODES.INS_LDA_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 
 				A = readByte(CPU.ciclos, addrAbs, CPU.mem);
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_AX: {
+			case CPU_6502.OPCODES.INS_LDA_AX: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 
 				int effAddrAbsX = addrAbs + X;
@@ -158,7 +121,7 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_AY: {
+			case CPU_6502.OPCODES.INS_LDA_AY: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsY = addrAbs + Y;
 				A = readByte(CPU.ciclos, effAddrAbsY, CPU.mem);
@@ -169,7 +132,7 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_IX: {
+			case CPU_6502.OPCODES.INS_LDA_IX: {
 				int addrIX = FetchByte(CPU.ciclos, CPU.mem);
 				addrIX += X;
 				while (addrIX >= 256) {
@@ -181,7 +144,7 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDA_IY: {
+			case CPU_6502.OPCODES.INS_LDA_IY: {
 				int addrIY = FetchByte(CPU.ciclos, CPU.mem);
 				while (addrIY >= 256) {
 					addrIY -= 256;
@@ -194,7 +157,7 @@ public class CPU {
 				LDASetStatus();
 				break;
 			}
-			case INS_LDX_IM: {
+			case CPU_6502.OPCODES.INS_LDX_IM: {
 				int val = FetchByte(CPU.ciclos, CPU.mem);
 				while (val >= 256) {
 					val -= 256;
@@ -203,7 +166,7 @@ public class CPU {
 				LDXSetStatus();
 				break;
 			}
-			case INS_LDX_ZP: {
+			case CPU_6502.OPCODES.INS_LDX_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				while (ZeroPageAddr >= 256) {
 					ZeroPageAddr -= 256;
@@ -212,7 +175,7 @@ public class CPU {
 				LDXSetStatus();
 				break;
 			}
-			case INS_LDX_ZPY: {
+			case CPU_6502.OPCODES.INS_LDX_ZPY: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += Y;
 				while (ZeroPageAddr > 256) {
@@ -223,13 +186,13 @@ public class CPU {
 				LDXSetStatus();
 				break;
 			}
-			case INS_LDX_AB: {
+			case CPU_6502.OPCODES.INS_LDX_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				X = readByte(CPU.ciclos, addrAbs, CPU.mem);
 				LDXSetStatus();
 				break;
 			}
-			case INS_LDX_ABY: {
+			case CPU_6502.OPCODES.INS_LDX_ABY: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + Y;
 				X = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
@@ -239,7 +202,7 @@ public class CPU {
 				LDXSetStatus();
 				break;
 			}
-			case INS_LDY_IM: {
+			case CPU_6502.OPCODES.INS_LDY_IM: {
 				int val = FetchByte(CPU.ciclos, CPU.mem);
 				while (val >= 256) {
 					val -= 256;
@@ -248,7 +211,7 @@ public class CPU {
 				LDYSetStatus();
 				break;
 			}
-			case INS_LDY_ZP: {
+			case CPU_6502.OPCODES.INS_LDY_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				while (ZeroPageAddr >= 256) {
 					ZeroPageAddr -= 256;
@@ -257,7 +220,7 @@ public class CPU {
 				LDYSetStatus();
 				break;
 			}
-			case INS_LDY_ZPX: {
+			case CPU_6502.OPCODES.INS_LDY_ZPX: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
 				while (ZeroPageAddr > 256) {
@@ -268,13 +231,13 @@ public class CPU {
 				LDYSetStatus();
 				break;
 			}
-			case INS_LDY_AB: {
+			case CPU_6502.OPCODES.INS_LDY_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				Y = readByte(CPU.ciclos, addrAbs, CPU.mem);
 				LDYSetStatus();
 				break;
 			}
-			case INS_LDY_ABX: {
+			case CPU_6502.OPCODES.INS_LDY_ABX: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + X;
 				Y = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
@@ -284,7 +247,7 @@ public class CPU {
 				LDYSetStatus();
 				break;
 			}
-			case INS_STA_ZP: { // 3 c
+			case CPU_6502.OPCODES.INS_STA_ZP: { // 3 c
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				while (ZeroPageAddr > 256) {
 					ZeroPageAddr -= 256;
@@ -294,7 +257,7 @@ public class CPU {
 
 				break;
 			}
-			case INS_STA_ZPX: { // 3 c
+			case CPU_6502.OPCODES.INS_STA_ZPX: { // 3 c
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
 				while (ZeroPageAddr > 256) {
@@ -305,14 +268,14 @@ public class CPU {
 
 				break;
 			}
-			case INS_STA_AB: {
+			case CPU_6502.OPCODES.INS_STA_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				CPU.mem.data[addrAbs] = A;
 				CPU.ciclos--;
 
 				break;
 			}
-			case INS_STA_ABX: {
+			case CPU_6502.OPCODES.INS_STA_ABX: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + X;
 				CPU.ciclos--;
@@ -324,7 +287,7 @@ public class CPU {
 
 				break;
 			}
-			case INS_STA_ABY: {
+			case CPU_6502.OPCODES.INS_STA_ABY: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + Y;
 				CPU.ciclos--;
@@ -336,26 +299,26 @@ public class CPU {
 
 				break;
 			}
-			case INS_STA_INX: {
+			case CPU_6502.OPCODES.INS_STA_INX: {
 				int addrIX = FetchByte(CPU.ciclos, CPU.mem);
 				addrIX += X;
 				CPU.ciclos--;
 				while (addrIX >= 256) {
 					addrIX -= 256;
 				}
-				
+
 				int effAddr = readWord(CPU.ciclos, addrIX, CPU.mem);
 				CPU.mem.data[effAddr] = A;
 				CPU.ciclos--;
 
 				break;
 			}
-			case INS_STA_INY: {
+			case CPU_6502.OPCODES.INS_STA_INY: {
 				int addrIY = FetchByte(CPU.ciclos, CPU.mem);
 				while (addrIY >= 256) {
 					addrIY -= 256;
 				} // F0
-				
+
 				int effAddr = readWord(CPU.ciclos, addrIY, CPU.mem);
 				effAddr += Y;
 				CPU.ciclos--;
@@ -365,7 +328,33 @@ public class CPU {
 
 				break;
 			}
-			case INS_JSR: {
+			case CPU_6502.OPCODES.INS_STX_ZP: { // 3 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+
+				writeByte(X, ZeroPageAddr, CPU.ciclos);
+
+				break;
+			}
+			case CPU_6502.OPCODES.INS_STX_ZPY: { // 4 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				ZeroPageAddr += Y;
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+				CPU.ciclos--;
+				writeByte(X, ZeroPageAddr, CPU.ciclos);
+				break;
+			}
+			case CPU_6502.OPCODES.INS_STX_AB: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+				CPU.mem.data[addrAbs] = X;
+				CPU.ciclos--;
+				break;
+			}
+			case CPU_6502.OPCODES.INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
 				writeWord(PC - 1, SP, CPU.ciclos);
 				SP++;

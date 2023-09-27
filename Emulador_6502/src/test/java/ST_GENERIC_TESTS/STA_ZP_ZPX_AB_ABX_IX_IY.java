@@ -23,8 +23,10 @@ public class STA_ZP_ZPX_AB_ABX_IX_IY {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU.INS_STA_ZP, 3 }, { CPU.INS_STA_ZPX, 4 }, { CPU.INS_STA_AB, 4 },
-				{ CPU.INS_STA_ABX, 5 }, { CPU.INS_STA_ABY, 5 }, { CPU.INS_STA_INX, 6 }, { CPU.INS_STA_INY, 6 } };
+		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_STA_ZP, 3 }, { CPU_6502.OPCODES.INS_STA_ZPX, 4 },
+				{ CPU_6502.OPCODES.INS_STA_AB, 4 }, { CPU_6502.OPCODES.INS_STA_ABX, 5 },
+				{ CPU_6502.OPCODES.INS_STA_ABY, 5 }, { CPU_6502.OPCODES.INS_STA_INX, 6 },
+				{ CPU_6502.OPCODES.INS_STA_INY, 6 } };
 		return Arrays.asList(data);
 	}
 
@@ -46,29 +48,29 @@ public class STA_ZP_ZPX_AB_ABX_IX_IY {
 		CPU.mem.data[0xFF48] = 0x37; // ABY Word = 0xFF42 + 0x06
 		CPU.mem.data[0x0010] = 0xA169; // ZPX byte = 0x42 + 0x04
 		CPU.mem.data[0x42] = 0x64; // INY Byte 0x64 = 100 + 0x06 = 6A (106)
-		CPU.mem.data[0x6A] = 0x00; // INY Byte 
-		
+		CPU.mem.data[0x6A] = 0x00; // INY Byte
+
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU.INS_STA_ZP == OPCODE) {
+		if (CPU_6502.OPCODES.INS_STA_ZP == OPCODE) {
 			assertEquals(CPU.mem.data[0x42], 0x02);
 
-		} else if (CPU.INS_STA_ZPX == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_STA_ZPX == OPCODE) {
 			assertEquals(CPU.mem.data[0x46], 0x02);
 
-		} else if (CPU.INS_STA_AB == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_STA_AB == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF42], 0x02);
 
-		} else if (CPU.INS_STA_ABX == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_STA_ABX == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF46], 0x02);
 
-		} else if (CPU.INS_STA_ABY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_STA_ABY == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF48], 0x02);
 
-		} else if (CPU.INS_STA_INX == OPCODE) {// A
+		} else if (CPU_6502.OPCODES.INS_STA_INX == OPCODE) {// A
 			assertEquals(CPU.mem.data[0x10], 0x02);
 
-		} else if (CPU.INS_STA_INY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_STA_INY == OPCODE) {
 			assertEquals(CPU.mem.data[0x6A], 0x02);
 
 		}

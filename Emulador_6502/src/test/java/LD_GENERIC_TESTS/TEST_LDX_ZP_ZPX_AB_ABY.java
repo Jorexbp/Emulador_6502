@@ -23,8 +23,8 @@ public class TEST_LDX_ZP_ZPX_AB_ABY {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU.INS_LDX_ZP, 3 }, { CPU.INS_LDX_ZPY, 4 }, { CPU.INS_LDX_AB, 4 },
-				{ CPU.INS_LDX_ABY, 4 } };
+		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_LDX_ZP, 3 }, { CPU_6502.OPCODES.INS_LDX_ZPY, 4 }, { CPU_6502.OPCODES.INS_LDX_AB, 4 },
+				{ CPU_6502.OPCODES.INS_LDX_ABY, 4 } };
 		return Arrays.asList(data);
 	}
 
@@ -43,25 +43,25 @@ public class TEST_LDX_ZP_ZPX_AB_ABY {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU.INS_LDX_ZP == OPCODE) {
+		if (CPU_6502.OPCODES.INS_LDX_ZP == OPCODE) {
 			assertEquals(CPU.X, 0x37);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDX_ZPY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDX_ZPY == OPCODE) {
 			assertEquals(CPU.X, 0x06);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDX_AB == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDX_AB == OPCODE) {
 			assertEquals(CPU.X, 0x10);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDX_ABY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDX_ABY == OPCODE) {
 			assertEquals(CPU.X, 0x84);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);

@@ -23,8 +23,9 @@ public class TEST_LDA_AB_AX_AY_IX_IY {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU.INS_LDA_AB, 4 }, { CPU.INS_LDA_AX, 4 }, { CPU.INS_LDA_AY, 4 },
-				{ CPU.INS_LDA_IX, 6 }, { CPU.INS_LDA_IY, 5 } };
+		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_LDA_AB, 4 }, { CPU_6502.OPCODES.INS_LDA_AX, 4 },
+				{ CPU_6502.OPCODES.INS_LDA_AY, 4 }, { CPU_6502.OPCODES.INS_LDA_IX, 6 },
+				{ CPU_6502.OPCODES.INS_LDA_IY, 5 } };
 		return Arrays.asList(data);
 	}
 
@@ -44,37 +45,35 @@ public class TEST_LDA_AB_AX_AY_IX_IY {
 		CPU.mem.data[0x00F2] = 0x37; // INX es byte solo lee los dos prim
 		CPU.mem.data[0x37] = 0x06; // INX
 
-		CPU.mem.data[0xF0] = 0x15; // INY 0x04 + 0x10  0x15==21
+		CPU.mem.data[0xF0] = 0x15; // INY 0x04 + 0x10 0x15==21
 		CPU.mem.data[0x19] = 0x86;
-
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU.INS_LDA_AB == OPCODE) {
+		if (CPU_6502.OPCODES.INS_LDA_AB == OPCODE) {
 			assertEquals(CPU.A, 0x10);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_AX == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_AX == OPCODE) {
 			assertEquals(CPU.A, 0x84);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_AY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_AY == OPCODE) {
 			assertEquals(CPU.A, 0x42);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_IX == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_IX == OPCODE) {
 			assertEquals(CPU.A, 0x06);
-			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU.INS_LDA_IY == OPCODE) {
+		} else if (CPU_6502.OPCODES.INS_LDA_IY == OPCODE) {
 			assertEquals(CPU.A, 0x86);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
