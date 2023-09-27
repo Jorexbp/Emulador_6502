@@ -180,10 +180,9 @@ public class CPU {
 			}
 			case INS_LDX_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
-				if (ZeroPageAddr >= 256) {
+				while (ZeroPageAddr >= 256) {
 					ZeroPageAddr -= 256;
 				}
-
 				X = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
 				LDXSetStatus();
 				break;
@@ -191,7 +190,7 @@ public class CPU {
 			case INS_LDX_ZPY: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += Y;
-				if (ZeroPageAddr > 256) {
+				while (ZeroPageAddr > 256) {
 					ZeroPageAddr -= 256;
 				}
 				CPU.ciclos--;
