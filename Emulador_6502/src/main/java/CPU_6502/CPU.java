@@ -354,6 +354,32 @@ public class CPU {
 				CPU.ciclos--;
 				break;
 			}
+			case CPU_6502.OPCODES.INS_STY_ZP: { // 3 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+
+				writeByte(Y, ZeroPageAddr, CPU.ciclos);
+
+				break;
+			}
+			case CPU_6502.OPCODES.INS_STY_ZPX: { // 4 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				ZeroPageAddr += X;
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+				CPU.ciclos--;
+				writeByte(Y, ZeroPageAddr, CPU.ciclos);
+				break;
+			}
+			case CPU_6502.OPCODES.INS_STY_AB: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+				CPU.mem.data[addrAbs] = Y;
+				CPU.ciclos--;
+				break;
+			}
 			case CPU_6502.OPCODES.INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
 				writeWord(PC - 1, SP, CPU.ciclos);

@@ -39,9 +39,8 @@ public class STX_ZP_ZPY_AB {
 
 		CPU.mem.data[0xFFFC] = OPCODE;
 		CPU.mem.data[0xFFFD] = 0xFF42; // ZP byte = 0x42
-		CPU.mem.data[0x0046] = 0x10; // ZPY byte = 0x42 + 0x04 
+		CPU.mem.data[0x0046] = 0x10; // ZPY byte = 0x42 + 0x04
 		CPU.mem.data[0xFF42] = 0x00; // AB Word = 0xFF42
-		
 
 		int ciclosUsados = cpu.execute(2, mem);
 
