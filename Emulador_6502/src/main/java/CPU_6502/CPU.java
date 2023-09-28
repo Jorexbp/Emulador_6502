@@ -270,17 +270,15 @@ public class CPU {
 			}
 			case CPU_6502.OPCODES.INS_STA_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
-				CPU.mem.data[addrAbs] = A;
-				CPU.ciclos--;
-
+				writeByte(A, addrAbs, CPU.ciclos);
 				break;
 			}
 			case CPU_6502.OPCODES.INS_STA_ABX: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + X;
 				CPU.ciclos--;
-				CPU.mem.data[effAddrAbsX] = A;
-				CPU.ciclos--;
+				writeByte(A, effAddrAbsX, CPU.ciclos);
+
 				if (effAddrAbsX - addrAbs >= 0xFF) {
 					CPU.ciclos--;
 				}
@@ -291,8 +289,8 @@ public class CPU {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				int effAddrAbsX = addrAbs + Y;
 				CPU.ciclos--;
-				CPU.mem.data[effAddrAbsX] = A;
-				CPU.ciclos--;
+				writeByte(A, effAddrAbsX, CPU.ciclos);
+
 				if (effAddrAbsX - addrAbs >= 0xFF) {
 					CPU.ciclos--;
 				}
@@ -308,8 +306,8 @@ public class CPU {
 				}
 
 				int effAddr = readWord(CPU.ciclos, addrIX, CPU.mem);
-				CPU.mem.data[effAddr] = A;
-				CPU.ciclos--;
+				writeByte(A, effAddr, CPU.ciclos);
+				
 
 				break;
 			}
@@ -323,9 +321,8 @@ public class CPU {
 				effAddr += Y;
 				CPU.ciclos--;
 
-				CPU.mem.data[effAddr] = A;
-				CPU.ciclos--;
-
+				writeByte(A, effAddr, CPU.ciclos);
+				
 				break;
 			}
 			case CPU_6502.OPCODES.INS_STX_ZP: { // 3 c
@@ -350,8 +347,8 @@ public class CPU {
 			}
 			case CPU_6502.OPCODES.INS_STX_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
-				CPU.mem.data[addrAbs] = X;
-				CPU.ciclos--;
+				writeByte(X, addrAbs, CPU.ciclos);
+				
 				break;
 			}
 			case CPU_6502.OPCODES.INS_STY_ZP: { // 3 c
@@ -376,8 +373,33 @@ public class CPU {
 			}
 			case CPU_6502.OPCODES.INS_STY_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
-				CPU.mem.data[addrAbs] = Y;
+				writeByte(Y, addrAbs, CPU.ciclos);
+				
+				break;
+			}
+			
+			case CPU_6502.OPCODES.INS_TAX_IP: {
+				X = A;
 				CPU.ciclos--;
+				LDXSetStatus();
+				break;
+			}
+			case CPU_6502.OPCODES.INS_TAY_IP: {
+				Y = A;
+				CPU.ciclos--;
+				LDYSetStatus();
+				break;
+			}
+			case CPU_6502.OPCODES.INS_TXA_IP: {
+				A = X;
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
+			case CPU_6502.OPCODES.INS_TYA_IP: {
+				A = Y;
+				CPU.ciclos--;
+				LDASetStatus();
 				break;
 			}
 			case CPU_6502.OPCODES.INS_JSR: {

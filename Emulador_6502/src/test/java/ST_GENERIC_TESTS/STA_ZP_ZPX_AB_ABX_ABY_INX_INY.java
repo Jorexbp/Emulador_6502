@@ -12,7 +12,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class STA_ZP_ZPX_AB_ABX_IX_IY {
+public class STA_ZP_ZPX_AB_ABX_ABY_INX_INY {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 

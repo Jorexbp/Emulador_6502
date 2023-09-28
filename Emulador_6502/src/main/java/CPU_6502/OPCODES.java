@@ -46,9 +46,18 @@ public class OPCODES {
 	public final static int INS_STY_ZPX = 0x94;
 	public final static int INS_STY_AB = 0x8C;
 
+	// TAX OPCODE
+	public final static int INS_TAX_IP = 0xAA;
+
+	// TAY OPCODE
+	public final static int INS_TAY_IP = 0xA8;
+
+	// TXA OPCODE
+	public final static int INS_TXA_IP = 0x8A;
+
+	// TYA OPCODE
+	public final static int INS_TYA_IP = 0x98;
+
 	public final static int INS_JSR = 0x20;
 
-	OPCODES() {
-
-	}
 }
