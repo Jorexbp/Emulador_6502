@@ -405,7 +405,7 @@ public class CPU {
 			case CPU_6502.OPCODES.INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
 				writeWord(PC - 1, SP, CPU.ciclos);
-				SP++;
+				SP+=2;
 				PC = JSRaddr;
 				CPU.ciclos--;
 				break;
