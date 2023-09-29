@@ -30,7 +30,7 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU copiaCPU = cpu;
 		CPU.mem.data[0xFFFC] = OPCODE;
 		CPU.mem.data[0xFFFD] = 0x42;

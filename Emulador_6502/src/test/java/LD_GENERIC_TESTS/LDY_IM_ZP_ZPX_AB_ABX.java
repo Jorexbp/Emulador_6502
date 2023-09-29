@@ -30,7 +30,7 @@ public class LDY_IM_ZP_ZPX_AB_ABX {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU.X = 0x02;
 		CPU copiaCPU = cpu;
 

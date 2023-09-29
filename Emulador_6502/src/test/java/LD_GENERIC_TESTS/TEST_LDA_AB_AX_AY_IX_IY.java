@@ -31,7 +31,7 @@ public class TEST_LDA_AB_AX_AY_IX_IY {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU.X = 0x02;
 		CPU.Y = 0x04;
 

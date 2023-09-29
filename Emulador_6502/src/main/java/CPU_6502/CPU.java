@@ -28,9 +28,9 @@ public class CPU {
 		CPU.mem = mem;
 	}
 
-	public void reset(CPU.Mem mem2) {
-		PC = 0xFFFC;
-		SP = 0x0100;
+	public void reset(int VectorReset, CPU.Mem mem2) {
+		PC = VectorReset;
+		SP = 0xFF;
 		D = 0;
 		A = 0;
 		X = 0;
@@ -307,7 +307,6 @@ public class CPU {
 
 				int effAddr = readWord(CPU.ciclos, addrIX, CPU.mem);
 				writeByte(A, effAddr, CPU.ciclos);
-				
 
 				break;
 			}
@@ -322,7 +321,7 @@ public class CPU {
 				CPU.ciclos--;
 
 				writeByte(A, effAddr, CPU.ciclos);
-				
+
 				break;
 			}
 			case CPU_6502.OPCODES.INS_STX_ZP: { // 3 c
@@ -348,7 +347,7 @@ public class CPU {
 			case CPU_6502.OPCODES.INS_STX_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				writeByte(X, addrAbs, CPU.ciclos);
-				
+
 				break;
 			}
 			case CPU_6502.OPCODES.INS_STY_ZP: { // 3 c
@@ -374,10 +373,10 @@ public class CPU {
 			case CPU_6502.OPCODES.INS_STY_AB: {
 				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
 				writeByte(Y, addrAbs, CPU.ciclos);
-				
+
 				break;
 			}
-			
+
 			case CPU_6502.OPCODES.INS_TAX_IP: {
 				X = A;
 				CPU.ciclos--;
@@ -404,10 +403,15 @@ public class CPU {
 			}
 			case CPU_6502.OPCODES.INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
-				writeWord(PC - 1, SP, CPU.ciclos);
-				SP+=2;
+				PushPCToStack(CPU.ciclos);
 				PC = JSRaddr;
 				CPU.ciclos--;
+				break;
+			}
+			case CPU_6502.OPCODES.INS_RTS: {
+				// No funciona bien esta parte
+				PC = PopWordFromStack();
+				CPU.ciclos -= 2;
 				break;
 			}
 			default:
@@ -430,6 +434,22 @@ public class CPU {
 		CPU.ciclos -= 2;
 		// mi pc es little.endian como el 6502
 		return data;
+	}
+
+	public int PopWordFromStack() {
+		int word = readWord(CPU.ciclos, SPToAddr(), CPU.mem);
+		SP += 2;
+		CPU.ciclos--;
+		return word;
+	}
+
+	public int SPToAddr() {
+		return 0x100 | SP;
+	}
+
+	public void PushPCToStack(int ciclos) {
+		writeWord(PC - 1, CPU.ciclos, SPToAddr());
+		SP -= 2;
 	}
 
 	public int FetchByte(int ciclos, Mem mem) {

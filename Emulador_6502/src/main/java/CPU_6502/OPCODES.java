@@ -59,5 +59,6 @@ public class OPCODES {
 	public final static int INS_TYA_IP = 0x98;
 
 	public final static int INS_JSR = 0x20;
+	public final static int INS_RTS = 0x60;
 
 }

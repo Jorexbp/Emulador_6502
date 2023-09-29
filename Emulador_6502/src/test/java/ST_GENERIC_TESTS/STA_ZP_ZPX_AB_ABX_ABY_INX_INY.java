@@ -32,7 +32,7 @@ public class STA_ZP_ZPX_AB_ABX_ABY_INX_INY {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU.A = 0x02; // Valor a comprobar en la mem correspondiente
 		CPU.X = 0x04;
 		CPU.Y = 0x06;

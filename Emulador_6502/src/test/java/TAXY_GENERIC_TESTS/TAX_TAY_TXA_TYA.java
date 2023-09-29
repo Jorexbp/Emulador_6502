@@ -30,7 +30,7 @@ public class TAX_TAY_TXA_TYA {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU.X = 0x37;
 		CPU.Y = 0x10;
 		CPU.A = 0x20;

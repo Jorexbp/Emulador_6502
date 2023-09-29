@@ -30,7 +30,7 @@ public class STX_ZP_ZPY_AB {
 
 	@Test
 	public void test() {
-		cpu.reset(mem);
+		cpu.reset(0xFFFC,mem);
 		CPU.X = 0x02; // Valor a comprobar en la mem correspondiente
 		CPU.Y = 0x04;
 		CPU copiaCPU = cpu;
