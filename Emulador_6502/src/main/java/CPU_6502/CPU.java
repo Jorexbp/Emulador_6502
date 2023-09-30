@@ -76,6 +76,7 @@ public class CPU {
 				while (val >= 256) {
 					val -= 256;
 				}
+				// System.out.println(val);
 				A = val;
 				LDASetStatus();
 
@@ -404,13 +405,14 @@ public class CPU {
 			case CPU_6502.OPCODES.INS_JSR: {
 				int JSRaddr = FetchWord(CPU.ciclos, CPU.mem);
 				PushPCToStack(CPU.ciclos);
+
 				PC = JSRaddr;
 				CPU.ciclos--;
 				break;
 			}
 			case CPU_6502.OPCODES.INS_RTS: {
-				// No funciona bien esta parte
-				PC = PopWordFromStack();
+
+				PC = PopWordFromStack() +1 ;
 				CPU.ciclos -= 2;
 				break;
 			}
@@ -424,6 +426,7 @@ public class CPU {
 	}
 
 	public int FetchWord(int ciclos, Mem mem) {
+
 		int data = CPU.mem.data[PC];
 		PC++;
 
@@ -437,7 +440,7 @@ public class CPU {
 	}
 
 	public int PopWordFromStack() {
-		int word = readWord(CPU.ciclos, SPToAddr(), CPU.mem);
+		int word = readWord(CPU.ciclos, SPToAddr() + 1, CPU.mem);
 		SP += 2;
 		CPU.ciclos--;
 		return word;
@@ -448,7 +451,7 @@ public class CPU {
 	}
 
 	public void PushPCToStack(int ciclos) {
-		writeWord(PC - 1, CPU.ciclos, SPToAddr());
+		writeWord(PC - 1, SPToAddr() - 1, CPU.ciclos);
 		SP -= 2;
 	}
 
