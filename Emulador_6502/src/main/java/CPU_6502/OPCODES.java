@@ -60,5 +60,8 @@ public class OPCODES {
 
 	public final static int INS_JSR = 0x20;
 	public final static int INS_RTS = 0x60;
+	
+	public final static int INS_JMP_AB = 0x4C;
+	public final static int INS_JMP_IN = 0x6C;
 
 }

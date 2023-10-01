@@ -412,8 +412,21 @@ public class CPU {
 			}
 			case CPU_6502.OPCODES.INS_RTS: {
 
-				PC = PopWordFromStack() +1 ;
+				PC = PopWordFromStack() + 1;
 				CPU.ciclos -= 2;
+				break;
+			}
+			case CPU_6502.OPCODES.INS_JMP_AB: {
+				int addr = FetchWord(CPU.ciclos, CPU.mem);
+				PC = addr;
+
+				break;
+			}
+			case CPU_6502.OPCODES.INS_JMP_IN: {
+				int addr = FetchWord(CPU.ciclos, CPU.mem);
+				addr = readWord(CPU.ciclos, addr, CPU.mem);
+				PC = addr;
+
 				break;
 			}
 			default:
