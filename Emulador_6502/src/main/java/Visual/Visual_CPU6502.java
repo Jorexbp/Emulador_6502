@@ -92,16 +92,19 @@ public class Visual_CPU6502 extends JFrame {
 			}
 		}
 		int opcode = Comando_Opcode.cambiarAOpcode(comando);
-
+		int cont = 1;
 		if (existe && opcode != -1) {
-			cpu.reset(0xFF00, CPU.mem);
+			try {
+				cpu.reset(0xFF00, CPU.mem);
 
-			CPU.mem.data[0xFF01] = opcode;
-			CPU.mem.data[0xFF02] = Integer.parseInt(valores[1]);
-
-			cpu.execute(2, CPU.mem);
-			MostrarPorConsola();
-
+				CPU.mem.data[0xFF01] = opcode;
+				CPU.mem.data[0xFF02] = Integer.parseInt(valores[cont]);
+				cont++;
+				cpu.execute(2, CPU.mem);
+				MostrarPorConsola();
+			} catch (Exception e) {
+				textArea.append("VALORES NO VALIDOS: \"" + valores[cont].trim() + "\"\n");
+			}
 		} else {
 			textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\n");
 		}
