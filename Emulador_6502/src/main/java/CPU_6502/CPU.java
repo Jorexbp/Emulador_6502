@@ -2,6 +2,8 @@ package CPU_6502;
 
 import java.io.IOException;
 
+import Excepciones.Excepcion_Instruccion;
+
 public class CPU {
 	// byte[] Dbyte = new byte[8];
 	// byte[] DWord = new byte[16];
@@ -430,7 +432,7 @@ public class CPU {
 				break;
 			}
 			default:
-				System.out.println("Instruccion no especificada");
+
 				break;
 			}
 

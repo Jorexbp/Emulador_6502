@@ -55,7 +55,7 @@ public class JMP_AB_IM {
 
 		assertEquals(cpu.N, false);
 		assertEquals(cpu.Z, false);
-
+		
 		assertEquals(cpu.C, copiaCPU.C);
 		assertEquals(cpu.I, copiaCPU.I);
 		assertEquals(cpu.D, copiaCPU.D);
