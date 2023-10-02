@@ -38,7 +38,6 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 		CPU.mem.data[0x0042] = 0x37;
 		// end LDA_ZP
 		
-
 		int ciclosUsados = cpu.execute(2, mem);
 
 		if (CPU_6502.OPCODES.INS_LDA_IM == OPCODE) {
@@ -46,6 +45,7 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
+		
 
 		} else if (CPU_6502.OPCODES.INS_LDA_ZP == OPCODE) {
 			assertEquals(CPU.A, 0x37);

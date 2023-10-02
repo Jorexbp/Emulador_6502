@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import javax.swing.ScrollPaneConstants;
 
 public class Visual_CPU6502 extends JFrame {
 
@@ -31,6 +32,7 @@ public class Visual_CPU6502 extends JFrame {
 	private String command = "";
 	private ArrayList<String> historial = new ArrayList<>();
 	private int n_comando;
+	private int valor_1;
 
 	/**
 	 * Launch the application.
@@ -66,7 +68,7 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n");
 	}
 
-	private void EjecutarComando(String comando) {
+	private void EjecutarComando(String comando, ArrayList<Integer> valores) {
 		boolean existe = false;
 		comando = comando.trim().toUpperCase();
 		for (OPCODES_ENUM ins : OPCODES_ENUM.values()) {
@@ -81,7 +83,7 @@ public class Visual_CPU6502 extends JFrame {
 			cpu.reset(0xFF00, CPU.mem);
 
 			CPU.mem.data[0xFF01] = opcode;
-			CPU.mem.data[0xFF02] = 0x42;
+			CPU.mem.data[0xFF02] = valores.get(0);
 
 			cpu.execute(2, CPU.mem);
 			MostrarPorConsola();
@@ -124,14 +126,22 @@ public class Visual_CPU6502 extends JFrame {
 			public void keyReleased(KeyEvent e) {
 				String texto = "";
 				int cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-
+				ArrayList<Integer> valores = new ArrayList<>();
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					command = textArea.getText().substring(cortr);
-					EjecutarComando(command);
-					textArea.append("Usuario > ");
 
-					historial.add(command.trim());
-					n_comando = 0;
+					if (textArea.getText().substring(cortr).trim().isEmpty()) {
+						textArea.setText(textArea.getText() + "Usuario > ");
+					} else {
+						command = textArea.getText().substring(cortr, textArea.getText().lastIndexOf(" "));
+						valores.add(Integer.parseInt(textArea.getText().substring(cortr + command.length()).trim()
+
+						));
+						EjecutarComando(command, valores);
+						textArea.append("Usuario > ");
+
+						historial.add(command.trim());
+						n_comando = 0;
+					}
 				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 
 					try {
