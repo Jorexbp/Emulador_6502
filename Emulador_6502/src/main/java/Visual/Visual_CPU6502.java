@@ -141,13 +141,15 @@ public class Visual_CPU6502 extends JFrame {
 				String texto = "";
 				int cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 				String valoresComas = "";
+				command = textArea.getText().substring(cortr).trim();
 				valoresComas = "";
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-
-					if (textArea.getText().substring(cortr).trim().isEmpty()) {
+					if (command.equals("EXIT")) {
+						dispose();
+					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
 						textArea.setText(textArea.getText() + "Usuario > ");
 					} else {
-						valoresComas += textArea.getText().substring(cortr, textArea.getText().indexOf(","));
+						valoresComas += textArea.getText().substring(cortr, textArea.getText().lastIndexOf(","));
 						valoresComas += textArea.getText().substring(cortr + valoresComas.length()).trim();
 						EjecutarComando(valoresComas);
 						textArea.append("Usuario > ");
@@ -159,8 +161,9 @@ public class Visual_CPU6502 extends JFrame {
 
 					try {
 						texto = textArea.getText();
-						String str = !historial.get(n_comando).toString().equals(command.trim()) ? "" : command.trim();
-						textArea.setText(texto + str); // HAcer que no se sobreponga
+						textArea.append(historial.get(n_comando).toString());
+						cortr += textArea.getText().lastIndexOf("Usuario > ") + 10
+								+ historial.get(n_comando).toString().length();
 						textArea.setCaretPosition(textArea.getText().length());
 						n_comando++;
 					} catch (Exception s) {
