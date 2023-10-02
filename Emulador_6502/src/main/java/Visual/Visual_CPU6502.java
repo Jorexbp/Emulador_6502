@@ -71,6 +71,23 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n");
 	}
 
+	private void MostrarMem() {
+		String s = "";
+
+		for (int i = 0; i < CPU.mem.data.length; i++) {
+
+			if (i % 64 == 0 && i != 0) {
+				s += CPU.mem.data[i] + "\n";
+			} else if (CPU.mem.data[i] != 0) {
+				s += "|" + CPU.mem.data[i] + "|";
+			} else {
+				s += CPU.mem.data[i];
+			}
+
+		}
+		textArea.append("\n" + s.replace("||", "|"));
+	}
+
 	private void EjecutarComando(String valoresComas) {
 		boolean existe = false;
 		StringTokenizer st = new StringTokenizer(valoresComas, ",");
@@ -100,6 +117,7 @@ public class Visual_CPU6502 extends JFrame {
 				CPU.mem.data[0xFF01] = opcode;
 				CPU.mem.data[0xFF02] = Integer.parseInt(valores[cont]);
 				cont++;
+
 				cpu.execute(2, CPU.mem);
 				MostrarPorConsola();
 			} catch (Exception e) {
@@ -149,6 +167,8 @@ public class Visual_CPU6502 extends JFrame {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (command.equals("EXIT")) {
 						dispose();
+					} else if (command.equals("SHOW")) {
+						MostrarMem();
 					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
 						textArea.setText(textArea.getText() + "Usuario > ");
 					} else {
