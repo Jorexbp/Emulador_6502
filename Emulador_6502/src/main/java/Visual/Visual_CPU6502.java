@@ -71,7 +71,9 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("Valor de la bandera V: " + cpu.V + "\n");
 
 		textArea.append("Valor de la bandera N: " + cpu.N + "\n");
-		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\n");
+		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\nUsuario > ");
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+		
 	}
 
 	private void MostrarMem() {
@@ -94,15 +96,13 @@ public class Visual_CPU6502 extends JFrame {
 		boolean existe = false;
 		StringTokenizer st = new StringTokenizer(valoresComas, ",");
 		String comando = "";
-		String valores[] = new String[st.countTokens()];
-
-		int i = 0;
+		ArrayList<String> valores = new ArrayList<>();
 		while (st.hasMoreTokens()) { // No funciona con un For
-			valores[i] = st.nextToken();
-			i++;
+			valores.add(st.nextToken());
+
 		}
 
-		comando = valores[0];
+		comando = valores.get(0);
 		comando = comando.trim().toUpperCase();
 		for (OPCODES_ENUM ins : OPCODES_ENUM.values()) {
 
@@ -117,23 +117,23 @@ public class Visual_CPU6502 extends JFrame {
 				cpu.reset(0xFF00, CPU.mem);
 
 				CPU.mem.data[0xFF01] = opcode;
-				CPU.mem.data[0xFF02] = Integer.parseInt(valores[cont]);
-				cont++;
+				CPU.mem.data[0xFF02] = Integer.parseInt(valores.get(cont));
+//				cont++;
+//				CPU.mem.data[0x6600] = Integer.parseInt(valores.get(cont));
+//				cont++;
 
 				cpu.execute(2, CPU.mem);
 				MostrarPorConsola();
 			} catch (Exception e) {
-				textArea.append("VALORES NO VALIDOS: \"" + valores[cont].trim() + "\"\n");
+				textArea.append("VALORES NO VALIDOS: \"" + (valores.get(cont)).trim() + "\"\nUsuario > ");
 			}
 		} else {
 			if (comando.equals("N")) {
 				textArea.append("\nUsuario > ");
 			} else {
-				textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\n");
+				textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\nUsuario > ");
 			}
-
 		}
-
 	}
 
 	public Visual_CPU6502() {
@@ -149,7 +149,6 @@ public class Visual_CPU6502 extends JFrame {
 		setExtendedState(MAXIMIZED_BOTH);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
@@ -183,7 +182,8 @@ public class Visual_CPU6502 extends JFrame {
 				}
 			}
 		});
-
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+		
 		textArea.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -205,7 +205,6 @@ public class Visual_CPU6502 extends JFrame {
 					} else {
 						valoresComas += textArea.getText().substring(cortr).trim();
 						EjecutarComando(valoresComas);
-						textArea.append("Usuario > ");
 						historial.add(command.trim());
 						n_comando = 0;
 					}
@@ -219,20 +218,19 @@ public class Visual_CPU6502 extends JFrame {
 					} catch (Exception s) {
 						n_comando = 0;
 						textArea.setCaretPosition(textArea.getText().length());
-
 					}
 				}
 				if (textArea.getCaretPosition() <= cortr) {
-					textArea.setCaretPosition(cortr);
+					try {
+						textArea.setCaretPosition(cortr);
+					} catch (Exception á0) {
+					}
 				}
-
 			}
 		});
-
 		textArea.setFont(new Font("Consolas", Font.BOLD, 14));
 		scrollPane.setViewportView(textArea);
 		textArea.setBackground(Color.BLACK);
 		textArea.setForeground(Color.WHITE);
-
 	}
 }
