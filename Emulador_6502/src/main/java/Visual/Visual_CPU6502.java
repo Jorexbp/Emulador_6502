@@ -35,11 +35,12 @@ public class Visual_CPU6502 extends JFrame {
 	private CPU cpu = new CPU();
 	private JPanel contentPane;
 	private JScrollPane scrollPane;
-	private JTextArea textArea;
-	private String command = "";
+	private static JTextArea textArea;
+	private String command = "", comando = "";
 	private ArrayList<String> historial = new ArrayList<>();
 	private ArrayList<String> comandosPredefinidos = new ArrayList<>();
-	private int n_comando, pregunta = 0, cortr;
+	private int n_comando, pregunta = 0;
+	private static int cortr;
 
 	/**
 	 * Launch the application.
@@ -60,6 +61,14 @@ public class Visual_CPU6502 extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	public void escribirExterno(String comando) {
+		this.comando = comando;
+		new Visual_CPU6502().setVisible(true);
+		textArea.append(comando);
+		EjecutarComando(comando);
+
+	}
+
 	public void MostrarPorConsola() {
 		textArea.append("\n//////////////////////////////////\nValor del registro A: " + CPU.A + "\n");
 		textArea.append("Valor del registro X: " + CPU.X + "\n");
@@ -74,29 +83,24 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("Valor de la bandera N: " + cpu.N + "\n");
 		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\nUsuario > ");
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-
+		textArea.setCaretPosition(cortr + comando.length());
 	}
 
 	private void MostrarMem() {
-
 		String s = "";
-
 		for (int i = 0; i < CPU.mem.data.length; i++) {
-
 			if (CPU.mem.data[i] != 0) {
 				s += "|" + CPU.mem.data[i] + "|";
 			} else {
 				s += CPU.mem.data[i];
 			}
-
 		}
 		textArea.append("\n" + s.replace("||", "|") + "\nUsuario > ");
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-
 	}
 
 	private void cargarComandosPredefinidos() {
-		String comandos[] = { "EXIT", "SHOW", "CLEAR", "CL" };
+		String comandos[] = { "EXIT", "SHOW", "SHO", "CLEAR", "CL" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
@@ -155,7 +159,14 @@ public class Visual_CPU6502 extends JFrame {
 			dispose();
 			new Visual_CPU6502().setVisible(true);
 			break;
+		case "CL":
+			dispose();
+			new Visual_CPU6502().setVisible(true);
+			break;
 		case "SHOW":
+			MostrarMem();
+			break;
+		case "SHO":
 			MostrarMem();
 			break;
 		default:
@@ -168,7 +179,11 @@ public class Visual_CPU6502 extends JFrame {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				scrollPane.setBounds(0, 0, getWidth(), getHeight());
+				try {
+					scrollPane.setBounds(0, 0, getWidth(), getHeight());
+				} catch (Exception ñ) {
+					// TODO: handle exception
+				}
 			}
 		});
 		setUndecorated(true);
@@ -256,5 +271,9 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.setForeground(Color.WHITE);
 
 		cargarComandosPredefinidos();
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+
+		textArea.setCaretPosition(cortr);
+
 	}
 }
