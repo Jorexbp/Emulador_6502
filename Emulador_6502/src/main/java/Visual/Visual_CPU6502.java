@@ -73,7 +73,7 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("Valor de la bandera N: " + cpu.N + "\n");
 		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\nUsuario > ");
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-		
+
 	}
 
 	private void MostrarMem() {
@@ -128,12 +128,16 @@ public class Visual_CPU6502 extends JFrame {
 				textArea.append("VALORES NO VALIDOS: \"" + (valores.get(cont)).trim() + "\"\nUsuario > ");
 			}
 		} else {
-			if (comando.equals("N")) {
+			if (comando.equals("N") && pregunta == 1) {
+
 				textArea.append("\nUsuario > ");
 			} else {
-				textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\nUsuario > ");
+				textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\n");
+				textArea.append("Usuario > ");
 			}
 		}
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+
 	}
 
 	public Visual_CPU6502() {
@@ -183,7 +187,7 @@ public class Visual_CPU6502 extends JFrame {
 			}
 		});
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-		
+
 		textArea.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -201,7 +205,8 @@ public class Visual_CPU6502 extends JFrame {
 						MostrarMem();
 						pregunta = 0;
 					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
-						textArea.setText(textArea.getText() + "Usuario > ");
+						textArea.append("Usuario > ");
+						cortr += 11;
 					} else {
 						valoresComas += textArea.getText().substring(cortr).trim();
 						EjecutarComando(valoresComas);
