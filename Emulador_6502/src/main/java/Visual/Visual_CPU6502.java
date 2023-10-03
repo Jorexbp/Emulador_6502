@@ -190,9 +190,6 @@ public class Visual_CPU6502 extends JFrame {
 				cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 				String valoresComas = "";
 				command = textArea.getText().substring(cortr).trim().toUpperCase();
-				valoresComas = "";
-
-				textArea.getDocument();
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (command.equals("EXIT")) {
 						dispose();
@@ -202,9 +199,8 @@ public class Visual_CPU6502 extends JFrame {
 						pregunta = 1;
 					} else if (command.equals("Y") && pregunta == 1) {
 						MostrarMem();
-
+						pregunta = 0;
 					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
-
 						textArea.setText(textArea.getText() + "Usuario > ");
 					} else {
 						valoresComas += textArea.getText().substring(cortr).trim();
@@ -225,6 +221,9 @@ public class Visual_CPU6502 extends JFrame {
 						textArea.setCaretPosition(textArea.getText().length());
 
 					}
+				}
+				if (textArea.getCaretPosition() <= cortr) {
+					textArea.setCaretPosition(cortr);
 				}
 
 			}
