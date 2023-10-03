@@ -38,6 +38,7 @@ public class Visual_CPU6502 extends JFrame {
 	private JTextArea textArea;
 	private String command = "";
 	private ArrayList<String> historial = new ArrayList<>();
+	private ArrayList<String> comandosPredefinidos = new ArrayList<>();
 	private int n_comando, pregunta = 0, cortr;
 
 	/**
@@ -89,7 +90,16 @@ public class Visual_CPU6502 extends JFrame {
 			}
 
 		}
-		textArea.append("\n" + s.replace("||", "|"));
+		textArea.append("\n" + s.replace("||", "|") + "\nUsuario > ");
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+
+	}
+
+	private void cargarComandosPredefinidos() {
+		String comandos[] = { "EXIT", "SHOW", "CLEAR", "CL" };
+		for (int i = 0; i < comandos.length; i++) {
+			comandosPredefinidos.add(comandos[i]);
+		}
 	}
 
 	private void EjecutarComando(String valoresComas) {
@@ -99,13 +109,11 @@ public class Visual_CPU6502 extends JFrame {
 		ArrayList<String> valores = new ArrayList<>();
 		while (st.hasMoreTokens()) { // No funciona con un For
 			valores.add(st.nextToken());
-
 		}
 
-		comando = valores.get(0);
-		comando = comando.trim().toUpperCase();
+		comando = valores.get(0).trim().toUpperCase();
+		;
 		for (OPCODES_ENUM ins : OPCODES_ENUM.values()) {
-
 			if (comando.equals(ins.toString())) {
 				existe = true;
 			}
@@ -118,10 +126,8 @@ public class Visual_CPU6502 extends JFrame {
 
 				CPU.mem.data[0xFF01] = opcode;
 				CPU.mem.data[0xFF02] = Integer.parseInt(valores.get(cont));
-//				cont++;
-//				CPU.mem.data[0x6600] = Integer.parseInt(valores.get(cont));
-//				cont++;
-
+				cont++;
+				CPU.mem.data[CPU.mem.data[0xFF02]] = Integer.parseInt(valores.get(cont));
 				cpu.execute(2, CPU.mem);
 				MostrarPorConsola();
 			} catch (Exception e) {
@@ -137,6 +143,24 @@ public class Visual_CPU6502 extends JFrame {
 			}
 		}
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+
+	}
+
+	private void valorarComandoPredefinido(String comando) {
+		switch (comando.toUpperCase()) {
+		case "EXIT":
+			dispose();
+			break;
+		case "CLEAR":
+			dispose();
+			new Visual_CPU6502().setVisible(true);
+			break;
+		case "SHOW":
+			MostrarMem();
+			break;
+		default:
+			break;
+		}
 
 	}
 
@@ -195,15 +219,8 @@ public class Visual_CPU6502 extends JFrame {
 				String valoresComas = "";
 				command = textArea.getText().substring(cortr).trim().toUpperCase();
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (command.equals("EXIT")) {
-						dispose();
-					} else if (command.equals("SHOW")) {
-						textArea.append("Este proceso enseña toda la memoria por consola.\n¿Quiere continuar?(Y/N)\n"
-								+ "Usuario > ");
-						pregunta = 1;
-					} else if (command.equals("Y") && pregunta == 1) {
-						MostrarMem();
-						pregunta = 0;
+					if (comandosPredefinidos.contains(command)) {
+						valorarComandoPredefinido(command);
 					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
 						textArea.append("Usuario > ");
 						cortr += 11;
@@ -237,5 +254,7 @@ public class Visual_CPU6502 extends JFrame {
 		scrollPane.setViewportView(textArea);
 		textArea.setBackground(Color.BLACK);
 		textArea.setForeground(Color.WHITE);
+
+		cargarComandosPredefinidos();
 	}
 }
