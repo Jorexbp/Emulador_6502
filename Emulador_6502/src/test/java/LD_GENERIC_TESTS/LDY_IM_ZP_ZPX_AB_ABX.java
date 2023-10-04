@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,14 +24,15 @@ public class LDY_IM_ZP_ZPX_AB_ABX {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_LDY_IM, 2 }, { CPU_6502.OPCODES.INS_LDY_ZP, 3 }, { CPU_6502.OPCODES.INS_LDY_ZPX, 4 },
-				{ CPU_6502.OPCODES.INS_LDY_AB, 4 }, { CPU_6502.OPCODES.INS_LDY_ABX, 4 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_LDY_IM.opcodeValue, 2 }, { OPCODES.INS_LDY_ZP.opcodeValue, 3 },
+				{ OPCODES.INS_LDY_ZPX.opcodeValue, 4 }, { OPCODES.INS_LDY_AB.opcodeValue, 4 },
+				{ OPCODES.INS_LDY_ABX.opcodeValue, 4 } };
 		return Arrays.asList(data);
 	}
 
 	@Test
 	public void test() {
-		cpu.reset(0xFFFC,mem);
+		cpu.reset(0xFFFC, mem);
 		CPU.X = 0x02;
 		CPU copiaCPU = cpu;
 
@@ -43,27 +45,27 @@ public class LDY_IM_ZP_ZPX_AB_ABX {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU_6502.OPCODES.INS_LDY_IM == OPCODE) {
+		if (OPCODES.INS_LDY_IM.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, 0x42);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDY_ZP == OPCODE) {
+		} else if (OPCODES.INS_LDY_ZP.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, 0x37);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDY_ZPX == OPCODE) {
+		} else if (OPCODES.INS_LDY_ZPX.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, 0x06);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDY_AB == OPCODE) {
+		} else if (OPCODES.INS_LDY_AB.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, 0x42);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDY_ABX == OPCODE) {
+		} else if (OPCODES.INS_LDY_ABX.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, 0x10);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);

@@ -13,6 +13,7 @@ import javax.swing.text.DocumentFilter;
 
 import CPU_6502.CPU;
 import CPU_6502.Comando_Opcode;
+import CPU_6502.OPCODES;
 import CPU_6502.OPCODES_ENUM;
 
 import javax.swing.JScrollPane;
@@ -39,7 +40,7 @@ public class Visual_CPU6502 extends JFrame {
 	private String command = "", comando = "";
 	private ArrayList<String> historial = new ArrayList<>();
 	private ArrayList<String> comandosPredefinidos = new ArrayList<>();
-	private int n_comando, pregunta = 0;
+	private int n_comando, pregunta = 0, vecRes;
 	private static int cortr;
 
 	/**
@@ -66,7 +67,22 @@ public class Visual_CPU6502 extends JFrame {
 		new Visual_CPU6502().setVisible(true);
 		textArea.append(comando);
 		EjecutarComando(comando);
+	}
 
+	private void resetCPU() {
+		cpu.reset(0xFF01, CPU.mem);
+		textArea.append("\nUsuario > ");
+		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+		textArea.setCaretPosition(cortr);
+	}
+
+	private void mostrarComandosPredefinidos() {
+		String comandos[] = cargarComandosPredefinidos();
+		textArea.append("LOS COMANDOS PREDEFINIDOS SON LOS SIGUIENTES\n");
+		for (int i = 0; i < comandos.length; i++) {
+			textArea.append("\n" + comandos[i]);
+		}
+		textArea.append("\n\nUsuario > ");
 	}
 
 	public void MostrarPorConsola() {
@@ -99,11 +115,12 @@ public class Visual_CPU6502 extends JFrame {
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 	}
 
-	private void cargarComandosPredefinidos() {
-		String comandos[] = { "EXIT", "SHOW", "SHO", "CLEAR", "CL" };
+	private String[] cargarComandosPredefinidos() {
+		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "CLEAR", "CL", "RESET" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
+		return comandos;
 	}
 
 	private void EjecutarComando(String valoresComas) {
@@ -116,25 +133,32 @@ public class Visual_CPU6502 extends JFrame {
 		}
 
 		comando = valores.get(0).trim().toUpperCase();
-		;
-		for (OPCODES_ENUM ins : OPCODES_ENUM.values()) {
+
+		for (OPCODES ins : OPCODES.values()) {
 			if (comando.equals(ins.toString())) {
 				existe = true;
 			}
 		}
 		int opcode = Comando_Opcode.cambiarAOpcode(comando);
+
 		int cont = 1;
 		if (existe && opcode != -1) {
 			try {
-				cpu.reset(0xFF00, CPU.mem);
-
+				resetCPU();
 				CPU.mem.data[0xFF01] = opcode;
 				CPU.mem.data[0xFF02] = Integer.parseInt(valores.get(cont));
 				cont++;
-				CPU.mem.data[CPU.mem.data[0xFF02]] = Integer.parseInt(valores.get(cont));
+				try {
+					CPU.mem.data[CPU.mem.data[0xFF02]] = Integer.parseInt(valores.get(cont));
+				} catch (Exception e) {
+
+				}
 				cpu.execute(2, CPU.mem);
+
 				MostrarPorConsola();
 			} catch (Exception e) {
+				e.printStackTrace();
+				cont--;
 				textArea.append("VALORES NO VALIDOS: \"" + (valores.get(cont)).trim() + "\"\nUsuario > ");
 			}
 		} else {
@@ -152,6 +176,9 @@ public class Visual_CPU6502 extends JFrame {
 
 	private void valorarComandoPredefinido(String comando) {
 		switch (comando.toUpperCase()) {
+		case "HELP":
+			mostrarComandosPredefinidos();
+			break;
 		case "EXIT":
 			dispose();
 			break;
@@ -164,10 +191,13 @@ public class Visual_CPU6502 extends JFrame {
 			new Visual_CPU6502().setVisible(true);
 			break;
 		case "SHOW":
+			MostrarPorConsola();
+			break;
+		case "SHOWMEM":
 			MostrarMem();
 			break;
-		case "SHO":
-			MostrarMem();
+		case "RESET":
+			resetCPU();
 			break;
 		default:
 			break;
@@ -182,7 +212,7 @@ public class Visual_CPU6502 extends JFrame {
 				try {
 					scrollPane.setBounds(0, 0, getWidth(), getHeight());
 				} catch (Exception ñ) {
-					// TODO: handle exception
+
 				}
 			}
 		});

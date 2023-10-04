@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,14 +24,14 @@ public class STY_ZP_ZPX_AB {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_STY_ZP, 3 }, { CPU_6502.OPCODES.INS_STY_ZPX, 4 },
-				{ CPU_6502.OPCODES.INS_STY_AB, 4 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_STY_ZP.opcodeValue, 3 },
+				{ OPCODES.INS_STY_ZPX.opcodeValue, 4 }, { OPCODES.INS_STY_AB.opcodeValue, 4 } };
 		return Arrays.asList(data);
 	}
 
 	@Test
 	public void test() {
-		cpu.reset(0xFFFC,mem);
+		cpu.reset(0xFFFC, mem);
 		CPU.Y = 0x02; // Valor a comprobar en la mem correspondiente
 		CPU.X = 0x04;
 		CPU copiaCPU = cpu;
@@ -44,13 +45,13 @@ public class STY_ZP_ZPX_AB {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU_6502.OPCODES.INS_STX_ZP == OPCODE) {
+		if (OPCODES.INS_STX_ZP.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0x42], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STX_ZPY == OPCODE) {
+		} else if (OPCODES.INS_STX_ZPY.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0x46], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STX_AB == OPCODE) {
+		} else if (OPCODES.INS_STX_AB.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF42], 0x02);
 
 		}

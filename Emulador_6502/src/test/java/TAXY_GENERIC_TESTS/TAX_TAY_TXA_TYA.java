@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,14 +24,14 @@ public class TAX_TAY_TXA_TYA {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_TAX_IP, 2 }, { CPU_6502.OPCODES.INS_TAY_IP, 2 },
-				{ CPU_6502.OPCODES.INS_TXA_IP, 2 }, { CPU_6502.OPCODES.INS_TYA_IP, 2 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_TAX_IP.opcodeValue, 2 }, { OPCODES.INS_TAY_IP.opcodeValue, 2 },
+				{ OPCODES.INS_TXA_IP.opcodeValue, 2 }, { OPCODES.INS_TYA_IP.opcodeValue, 2 } };
 		return Arrays.asList(data);
 	}
 
 	@Test
 	public void test() {
-		cpu.reset(0xFFFC,mem);
+		cpu.reset(0xFFFC, mem);
 		CPU.X = 0x37;
 		CPU.Y = 0x10;
 		CPU.A = 0x20;
@@ -40,16 +41,16 @@ public class TAX_TAY_TXA_TYA {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU_6502.OPCODES.INS_TXA_IP == OPCODE) {
+		if (OPCODES.INS_TXA_IP.opcodeValue == OPCODE) {
 			assertEquals(CPU.X, CPU.A);
 
-		} else if (CPU_6502.OPCODES.INS_TYA_IP == OPCODE) {
+		} else if (OPCODES.INS_TYA_IP.opcodeValue == OPCODE) {
 			assertEquals(CPU.Y, CPU.A);
 
-		} else if (CPU_6502.OPCODES.INS_TAX_IP == OPCODE) {
+		} else if (OPCODES.INS_TAX_IP.opcodeValue == OPCODE) {
 			assertEquals(CPU.A, CPU.X);
 
-		} else if (CPU_6502.OPCODES.INS_TAY_IP == OPCODE) {
+		} else if (OPCODES.INS_TAY_IP.opcodeValue == OPCODE) {
 			assertEquals(CPU.A, CPU.Y);
 
 		}

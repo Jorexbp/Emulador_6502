@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class JSR_STATUSNOAFECTA {
 	public static Collection<Object[]> data() {
 		// Necesita 13 por que usa JSR ( 6 ciclos ), el RTS ( 6 ciclos ) y el LDA_IM ( 1
 		// ciclo)
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_JSR, 12 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_JSR.opcodeValue, 12 } };
 		return Arrays.asList(data);
 	}
 
@@ -37,7 +38,7 @@ public class JSR_STATUSNOAFECTA {
 		CPU.mem.data[0xFF00] = OPCODE;
 		CPU.mem.data[0xFF01] = 0x00;
 		CPU.mem.data[0xFF02] = 0x80;
-		CPU.mem.data[0x8000] = CPU_6502.OPCODES.INS_RTS;
+		CPU.mem.data[0x8000] = OPCODES.INS_RTS.opcodeValue;
 		CPU.mem.data[0xFF03] = 0x37;
 
 		int ciclosUsados = cpu.execute(CICLOS, mem);

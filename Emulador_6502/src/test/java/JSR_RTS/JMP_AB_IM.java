@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class JMP_AB_IM {
 	public static Collection<Object[]> data() {
 		// Necesita 13 por que usa JSR ( 6 ciclos ), el RTS ( 6 ciclos ) y el LDA_IM ( 1
 		// ciclo)
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_JMP_AB, 3 }, { CPU_6502.OPCODES.INS_JMP_IN, 5 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_JMP_AB.opcodeValue, 3 }, { OPCODES.INS_JMP_IN.opcodeValue, 5 } };
 		return Arrays.asList(data);
 	}
 
@@ -43,10 +44,10 @@ public class JMP_AB_IM {
 
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
-		if (OPCODE == CPU_6502.OPCODES.INS_JMP_AB) {
+		if (OPCODE == OPCODES.INS_JMP_AB.opcodeValue) {
 			assertEquals(cpu.PC, 0x8000);
 
-		} else if (OPCODE == CPU_6502.OPCODES.INS_JMP_IN) {
+		} else if (OPCODE == OPCODES.INS_JMP_IN.opcodeValue) {
 			assertEquals(cpu.PC, 0x9000);
 
 		}

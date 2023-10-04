@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,8 +24,8 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_LDA_IM, 2 }, { CPU_6502.OPCODES.INS_LDA_ZP, 3 }, { CPU_6502.OPCODES.INS_LDA_ZX, 4 },
-				{ CPU_6502.OPCODES.INS_LDX_IM, 2 }};
+		Object[][] data = new Object[][] { { OPCODES.INS_LDA_IM.opcodeValue, 2 }, { OPCODES.INS_LDA_ZP.opcodeValue, 3 }, { OPCODES.INS_LDA_ZX.opcodeValue, 4 },
+				{ OPCODES.INS_LDX_IM.opcodeValue, 2 }};
 		return Arrays.asList(data);
 	}
 
@@ -40,19 +41,19 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 		
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU_6502.OPCODES.INS_LDA_IM == OPCODE) {
+		if (OPCODES.INS_LDA_IM.opcodeValue == OPCODE) {
 			assertEquals(CPU.A, 0x42);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 		
 
-		} else if (CPU_6502.OPCODES.INS_LDA_ZP == OPCODE) {
+		} else if (OPCODES.INS_LDA_ZP.opcodeValue == OPCODE) {
 			assertEquals(CPU.A, 0x37);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDA_ZX == OPCODE) {
+		} else if (OPCODES.INS_LDA_ZX.opcodeValue == OPCODE) {
 			// Sirve para sumar X en el caso de necesidad,
 			// por el test no lo implemente
 			assertEquals(CPU.A, 0x37);
@@ -60,7 +61,7 @@ public class TEST_LDA_IM_ZP_ZX_LDX_IM {
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);
 
-		} else if (CPU_6502.OPCODES.INS_LDX_IM == OPCODE) {
+		} else if (OPCODES.INS_LDX_IM.opcodeValue == OPCODE) {
 			assertEquals(CPU.X, 0x42);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);

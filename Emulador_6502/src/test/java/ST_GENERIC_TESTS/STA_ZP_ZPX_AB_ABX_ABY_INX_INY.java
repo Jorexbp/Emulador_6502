@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import CPU_6502.CPU;
+import CPU_6502.OPCODES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,10 +24,10 @@ public class STA_ZP_ZPX_AB_ABX_ABY_INX_INY {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { CPU_6502.OPCODES.INS_STA_ZP, 3 }, { CPU_6502.OPCODES.INS_STA_ZPX, 4 },
-				{ CPU_6502.OPCODES.INS_STA_AB, 4 }, { CPU_6502.OPCODES.INS_STA_ABX, 5 },
-				{ CPU_6502.OPCODES.INS_STA_ABY, 5 }, { CPU_6502.OPCODES.INS_STA_INX, 6 },
-				{ CPU_6502.OPCODES.INS_STA_INY, 6 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_STA_ZP.opcodeValue, 3 }, { OPCODES.INS_STA_ZPX.opcodeValue, 4 },
+				{ OPCODES.INS_STA_AB.opcodeValue, 4 }, { OPCODES.INS_STA_ABX.opcodeValue, 5 },
+				{ OPCODES.INS_STA_ABY.opcodeValue, 5 }, { OPCODES.INS_STA_INX.opcodeValue, 6 },
+				{ OPCODES.INS_STA_INY.opcodeValue, 6 } };
 		return Arrays.asList(data);
 	}
 
@@ -52,25 +53,25 @@ public class STA_ZP_ZPX_AB_ABX_ABY_INX_INY {
 
 		int ciclosUsados = cpu.execute(2, mem);
 
-		if (CPU_6502.OPCODES.INS_STA_ZP == OPCODE) {
+		if (OPCODES.INS_STA_ZP.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0x42], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_ZPX == OPCODE) {
+		} else if (OPCODES.INS_STA_ZPX.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0x46], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_AB == OPCODE) {
+		} else if (OPCODES.INS_STA_AB.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF42], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_ABX == OPCODE) {
+		} else if (OPCODES.INS_STA_ABX.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF46], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_ABY == OPCODE) {
+		} else if (OPCODES.INS_STA_ABY.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0xFF48], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_INX == OPCODE) {// A
+		} else if (OPCODES.INS_STA_INX.opcodeValue == OPCODE) {// A
 			assertEquals(CPU.mem.data[0x10], 0x02);
 
-		} else if (CPU_6502.OPCODES.INS_STA_INY == OPCODE) {
+		} else if (OPCODES.INS_STA_INY.opcodeValue == OPCODE) {
 			assertEquals(CPU.mem.data[0x6A], 0x02);
 
 		}
