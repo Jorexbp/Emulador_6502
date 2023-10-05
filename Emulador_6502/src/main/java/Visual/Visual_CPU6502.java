@@ -14,7 +14,6 @@ import javax.swing.text.DocumentFilter;
 import CPU_6502.CPU;
 import CPU_6502.Comando_Opcode;
 import CPU_6502.OPCODES;
-import CPU_6502.OPCODES_ENUM;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -40,7 +39,7 @@ public class Visual_CPU6502 extends JFrame {
 	private String command = "", comando = "";
 	private ArrayList<String> historial = new ArrayList<>();
 	private ArrayList<String> comandosPredefinidos = new ArrayList<>();
-	private int n_comando, pregunta = 0, vecRes;
+	private int n_comando, pregunta = 0;
 	private static int cortr;
 
 	/**
@@ -277,7 +276,7 @@ public class Visual_CPU6502 extends JFrame {
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 					try {
-						textArea.append(historial.get(n_comando).toString());
+						textArea.append(historial.get(historial.size()-1).toString());
 						cortr += textArea.getText().lastIndexOf("Usuario > ") + 10
 								+ historial.get(n_comando).toString().length();
 						textArea.setCaretPosition(textArea.getText().length());

@@ -501,40 +501,6 @@ public class CPU {
 		return CPU.mem.data[dir];
 	}
 
-	public static void main(String[] args) throws IOException {
-//		Mem mem = new Mem();
-//		CPU cpu = new CPU();
-//		cpu.reset(mem);
-//
-//		CPU.mem.data[0xFFFC] = INS_JSR;
-//		CPU.mem.data[0xFFFD] = 0x42;
-//		CPU.mem.data[0xFFFE] = 0x42;
-//		CPU.mem.data[0x4242] = INS_LDA_IM;
-//		CPU.mem.data[0x4243] = 0x84;
-//
-//		cpu.execute(9, mem);
-//		// 31:27 s vid
-//
-//		String s = "";
-//
-//		for (int i = 0; i < CPU.mem.data.length; i++) {
-//
-//			if (i % 64 == 0 && i != 0) {
-//				s += CPU.mem.data[i] + "\n";
-//			} else if (CPU.mem.data[i] != 0) {
-//				s += "|" + CPU.mem.data[i] + "|";
-//			} else {
-//				s += CPU.mem.data[i];
-//			}
-//
-//		}
-//		System.out.println(s.replace("||", "|"));
-
-		// System.out.println(cpu.leerByte(0x01));
-		// System.out.println(cpu.mem[0x01]);
-		// System.out.println(CPU.mem.data.length);
-	}
-
 	public static class Mem {
 		final static int MAX_MEM = 1024 * 64;
 		public int data[] = new int[Mem.MAX_MEM];
