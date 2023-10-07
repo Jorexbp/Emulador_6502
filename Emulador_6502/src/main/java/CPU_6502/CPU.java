@@ -1,7 +1,5 @@
 package CPU_6502;
 
-import java.io.IOException;
-
 public class CPU {
 	// byte[] Dbyte = new byte[8];
 	// byte[] DWord = new byte[16];
@@ -19,9 +17,12 @@ public class CPU {
 
 	// status flags
 
-	public int D, C, I, B, V;
+	public int D, C, I, B, V, Un;
 	public boolean N;
 	public boolean Z;
+
+	// Procesor Status
+	public int PS;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -38,25 +39,43 @@ public class CPU {
 		C = 0;
 		Z = false;
 		I = 0;
+		Un = 0;
 		B = 0;
 		V = 0;
 		N = false;
 		CPU.mem = mem2;
+		ProcesorStatus();
+
 	}
 
 	private void LDASetStatus() {
 		Z = (A == 0);
 		N = (A & 0b01000000) > 0;
+		ProcesorStatus();
+
 	}
 
 	private void LDXSetStatus() {
 		Z = (X == 0);
-		N = (X & 0b01000000) > 0;
+		N = (X & 0b1000000) > 0;
+		ProcesorStatus();
+
 	}
 
 	private void LDYSetStatus() {
 		Z = (Y == 0);
 		N = (Y & 0b01000000) > 0;
+		ProcesorStatus();
+
+	}
+
+	public void ProcesorStatus() {
+		int zbit = (Z == true) ? 1 : 0;
+		int nbit = (N == true) ? 1 : 0;
+		String bits = String.valueOf(C).concat(String.valueOf(zbit)).concat(String.valueOf(I)).concat(String.valueOf(D))
+				.concat(String.valueOf(B)).concat(String.valueOf(Un)).concat(String.valueOf(V))
+				.concat(String.valueOf(nbit));
+		PS = Integer.parseInt(bits, 2);
 	}
 
 	public int execute(int ciclos, Mem mem) {
@@ -428,6 +447,37 @@ public class CPU {
 
 				break;
 			}
+			case INS_TSX_IM: { // 2 c
+				X = SP;
+				CPU.ciclos--;
+
+				LDXSetStatus();
+				break;
+			}
+			case INS_TXS_IM: { // 2 c
+				SP = X;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_PHA_IM: { // 3 c
+				PushByteToStack(A);
+				break;
+			}
+
+			case INS_PLA_IM: { // 4 c
+				A = PopWordFromStack();
+				LDASetStatus();
+				break;
+			}
+			case INS_PLP_IM: { // 3 c
+				PS = PopWordFromStack();
+				break;
+			}
+			case INS_PHP_IM: { // 3 c
+				PushByteToStack(PS);
+				break;
+			}
+
 			default:
 
 				break;
@@ -458,6 +508,15 @@ public class CPU {
 		return word;
 	}
 
+	public int PopByteFromStack() {
+		SP++;
+		int addr = SPToAddr();
+		int value = mem.data[addr];
+		CPU.ciclos -= 3;
+
+		return value;
+	}
+
 	public int SPToAddr() {
 		return 0x100 | SP;
 	}
@@ -465,6 +524,13 @@ public class CPU {
 	public void PushPCToStack(int ciclos) {
 		writeWord(PC - 1, SPToAddr() - 1, CPU.ciclos);
 		SP -= 2;
+	}
+
+	public void PushByteToStack(int value) {
+		int addr = SPToAddr();
+		CPU.mem.data[addr] = value;
+		SP--;
+		CPU.ciclos -= 2;
 	}
 
 	public int FetchByte(int ciclos, Mem mem) {

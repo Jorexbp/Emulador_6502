@@ -36,7 +36,10 @@ public enum OPCODES {
 
 	INS_JSR(0x20), INS_RTS(0x60),
 
-	INS_JMP_AB(0x4C), INS_JMP_IN(0x6C);
+	INS_JMP_AB(0x4C), INS_JMP_IN(0x6C),
+
+	// STACK OPERATIONS
+	INS_TSX_IM(0xBA), INS_TXS_IM(0x9A), INS_PHA_IM(0x48), INS_PHP_IM(0x08), INS_PLA_IM(0x68), INS_PLP_IM(0x28);
 
 	public final int opcodeValue;
 

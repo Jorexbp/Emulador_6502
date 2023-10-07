@@ -1,4 +1,4 @@
-package JSR_RTS;
+package STACK_OPERATIONS_TESTS;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class JMP_AB_IM {
+public class PHP_TESTS {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -24,9 +24,9 @@ public class JMP_AB_IM {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		// Necesita 13 por que usa JSR ( 6 ciclos ), el RTS ( 6 ciclos ) y el LDA_IM ( 1
-		// ciclo)
-		Object[][] data = new Object[][] { { OPCODES.INS_JMP_AB.opcodeValue, 3 }, { OPCODES.INS_JMP_IN.opcodeValue, 5 } };
+		
+		Object[][] data = new Object[][] { { OPCODES.INS_PHP_IM.opcodeValue, 3 }
+ };
 		return Arrays.asList(data);
 	}
 
@@ -34,29 +34,28 @@ public class JMP_AB_IM {
 	public void test() {
 		cpu.reset(0xFF00, mem);
 		CPU copiaCPU = cpu;
-
-		CPU.mem.data[0xFF00] = OPCODE;
-		CPU.mem.data[0xFF01] = 0x00;
-		CPU.mem.data[0xFF02] = 0x80;
-		CPU.mem.data[0x8000] = 0x00;
-		CPU.mem.data[0x8001] = 0x90;
-
+		
+		cpu.PS = 0xCC; 
+		
+		CPU.mem.data[0xFF00] = OPCODE;// Setear los valores correspondientes
+		
 
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
-		if (OPCODE == OPCODES.INS_JMP_AB.opcodeValue) {
-			assertEquals(cpu.PC, 0x8000);
-
-		} else if (OPCODE == OPCODES.INS_JMP_IN.opcodeValue) {
-			assertEquals(cpu.PC, 0x9000);
-
-		}
-
-		assertEquals(ciclosUsados, CICLOS);
-
+		if (OPCODE == OPCODES.INS_PHP_IM.opcodeValue) {
+			assertEquals(CPU.mem.data[cpu.SPToAddr()+1], 0xCC);
+			
+		} else if (OPCODE == OPCODES.INS_PLA_IM.opcodeValue) {
+			assertEquals(CPU.mem.data[cpu.SPToAddr()+1], 0xCC);
+			
+		} 
 		assertEquals(cpu.N, false);
 		assertEquals(cpu.Z, false);
+		assertEquals(ciclosUsados, CICLOS);
+		assertEquals(cpu.PS, copiaCPU.PS);
+
 		
+
 		assertEquals(cpu.C, copiaCPU.C);
 		assertEquals(cpu.I, copiaCPU.I);
 		assertEquals(cpu.D, copiaCPU.D);
