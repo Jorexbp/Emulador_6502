@@ -66,6 +66,7 @@ public enum OPCODES {
 				return country;
 			}
 		}
+		
 		throw new IllegalArgumentException();
 	}
 }

@@ -480,7 +480,7 @@ public class CPU {
 			case INS_AND_IM: { // 2 c
 				A &= FetchByte(CPU.ciclos, CPU.mem);
 				LDASetStatus();
-				
+
 				// 0 true, 1 false
 				break;
 			}
@@ -567,12 +567,12 @@ public class CPU {
 				break;
 			}
 			case INS_EOR_IM: { // 2 c
-				int byteValue =FetchByte(CPU.ciclos, CPU.mem);
-				while(byteValue>=256) {
+				int byteValue = FetchByte(CPU.ciclos, CPU.mem);
+				while (byteValue >= 256) {
 					byteValue -= 256;
 				}
 				A ^= byteValue;
-				
+
 				LDASetStatus();
 				break;
 			}
@@ -657,13 +657,14 @@ public class CPU {
 				LDASetStatus();
 
 				break;
-			}case INS_ORA_IM: { // 2 c
-				int byteValue =FetchByte(CPU.ciclos, CPU.mem);
-				while(byteValue>=256) {
+			}
+			case INS_ORA_IM: { // 2 c
+				int byteValue = FetchByte(CPU.ciclos, CPU.mem);
+				while (byteValue >= 256) {
 					byteValue -= 256;
 				}
 				A |= byteValue;
-				
+
 				LDASetStatus();
 				break;
 			}
@@ -749,6 +750,29 @@ public class CPU {
 
 				break;
 			}
+			case INS_BIT_ZP: {
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				while (ZeroPageAddr >= 256) {
+					ZeroPageAddr -= 256;
+				}
+				int valor = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
+				Z = (A & valor) == 0;
+//				PS |= (valor & 0b1100000);
+				V = (valor & 0b010000);
+				N = (valor & 0b100000)>0;
+				break;
+			}
+			case INS_BIT_AB: {
+				int addr = FetchWord(CPU.ciclos, CPU.mem);
+				
+				int valor = readByte(CPU.ciclos, addr, CPU.mem);
+				Z = (A & valor) == 0;
+				//PS |= (valor & 0b1100000);
+				V = (valor & 0b010000);
+				N = (valor & 0b100000)>0;
+				break;
+			}
+			
 			default:
 
 				break;
