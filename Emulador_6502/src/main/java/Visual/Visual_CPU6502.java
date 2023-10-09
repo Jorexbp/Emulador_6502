@@ -68,6 +68,25 @@ public class Visual_CPU6502 extends JFrame {
 		EjecutarComando(comando);
 	}
 
+	public void MostrarIns() {
+		String val = "\n";
+		int cont = 0;
+		int m = 0;
+		for (OPCODES string : OPCODES.values()) {
+			if(cont == 20) {
+				val += string.toString() + "\n";
+				cont = 0;	
+			}else {
+				val += string.toString() + "\t";
+				
+			}
+			
+			cont++;
+			m++;
+		}
+		textArea.append(val + "\nCOMANDOS TOTALES: " + m + "\nUsuario > ");
+	}
+
 	private void resetCPU() {
 		cpu.reset(0xFF01, CPU.mem);
 		textArea.append("\nUsuario > ");
@@ -115,7 +134,7 @@ public class Visual_CPU6502 extends JFrame {
 	}
 
 	private String[] cargarComandosPredefinidos() {
-		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "CLEAR", "CL", "RESET" };
+		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
@@ -154,7 +173,6 @@ public class Visual_CPU6502 extends JFrame {
 				}
 				cpu.execute(2, CPU.mem);
 
-				MostrarPorConsola();
 			} catch (Exception e) {
 				e.printStackTrace();
 				cont--;
@@ -194,6 +212,9 @@ public class Visual_CPU6502 extends JFrame {
 			break;
 		case "SHOWMEM":
 			MostrarMem();
+			break;
+		case "SHOWINS":
+			MostrarIns();
 			break;
 		case "RESET":
 			resetCPU();
@@ -276,7 +297,7 @@ public class Visual_CPU6502 extends JFrame {
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 					try {
-						textArea.append(historial.get(historial.size()-1).toString());
+						textArea.append(historial.get(historial.size() - 1).toString());
 						cortr += textArea.getText().lastIndexOf("Usuario > ") + 10
 								+ historial.get(n_comando).toString().length();
 						textArea.setCaretPosition(textArea.getText().length());
