@@ -50,7 +50,7 @@ public class CPU {
 
 	private void LDASetStatus() {
 		Z = (A == 0);
-		N = (A & 0b01000000) > 0;
+		N = (A & 0b1000000) > 0;
 		ProcesorStatus();
 
 	}
@@ -64,7 +64,7 @@ public class CPU {
 
 	private void LDYSetStatus() {
 		Z = (Y == 0);
-		N = (Y & 0b01000000) > 0;
+		N = (Y & 0b1000000) > 0;
 		ProcesorStatus();
 
 	}
@@ -102,7 +102,7 @@ public class CPU {
 			}
 			case INS_LDA_ZP: {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
-				if (ZeroPageAddr >= 256) {
+				while (ZeroPageAddr >= 256) {
 					ZeroPageAddr -= 256;
 				}
 
@@ -114,7 +114,7 @@ public class CPU {
 				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
 				ZeroPageAddr += X;
 
-				if (ZeroPageAddr > 256) {
+				while (ZeroPageAddr > 256) {
 					ZeroPageAddr -= 256;
 				}
 				CPU.ciclos--;
@@ -477,6 +477,34 @@ public class CPU {
 				PushByteToStack(PS);
 				break;
 			}
+			case INS_AND_IM: { // 2 c
+				A &= FetchByte(CPU.ciclos, CPU.mem);
+				LDASetStatus();
+				// 0 true, 1 false
+				break;
+			}
+			case INS_AND_ZP: { // 3 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				CPU.ciclos--;
+				while (ZeroPageAddr >= 256) {
+					ZeroPageAddr -= 256;
+				}
+				A &= CPU.mem.data[ZeroPageAddr];
+				LDASetStatus();
+				break;
+			}
+			case INS_AND_ZPX: {
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				ZeroPageAddr += X;
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+				CPU.ciclos--;
+				A &= CPU.mem.data[ZeroPageAddr];
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
 
 			default:
 
@@ -485,6 +513,12 @@ public class CPU {
 
 		}
 		return ciclosPedidos - CPU.ciclos;
+	}
+
+	public int compararValorConByte(int acumulador, int addr) {
+		int valorByte = mem.data[addr];
+		boolean compara = (valorByte ^ acumulador) == 0;
+		return compara ? 0 : 1;
 	}
 
 	public int FetchWord(int ciclos, Mem mem) {
