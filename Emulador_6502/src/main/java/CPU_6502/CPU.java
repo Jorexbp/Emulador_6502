@@ -657,6 +657,97 @@ public class CPU {
 				LDASetStatus();
 
 				break;
+			}case INS_ORA_IM: { // 2 c
+				int byteValue =FetchByte(CPU.ciclos, CPU.mem);
+				while(byteValue>=256) {
+					byteValue -= 256;
+				}
+				A |= byteValue;
+				
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_ZP: { // 3 c
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				CPU.ciclos--;
+				while (ZeroPageAddr >= 256) {
+					ZeroPageAddr -= 256;
+				}
+				A |= CPU.mem.data[ZeroPageAddr];
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_ZPX: {
+				int ZeroPageAddr = FetchByte(CPU.ciclos, CPU.mem);
+				ZeroPageAddr += X;
+				while (ZeroPageAddr > 256) {
+					ZeroPageAddr -= 256;
+				}
+				CPU.ciclos--;
+				A |= CPU.mem.data[ZeroPageAddr];
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_AB: {
+				int addr = FetchWord(CPU.ciclos, CPU.mem);
+				A |= CPU.mem.data[addr];
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_ABX: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+
+				int effAddrAbsX = addrAbs + X;
+				if (effAddrAbsX - addrAbs >= 0xFF) {
+					CPU.ciclos--;
+				}
+				A |= CPU.mem.data[effAddrAbsX];
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_ABY: {
+				int addrAbs = FetchWord(CPU.ciclos, CPU.mem);
+
+				int effAddrAbsY = addrAbs + Y;
+				if (effAddrAbsY - addrAbs >= 0xFF) {
+					CPU.ciclos--;
+				}
+				A |= CPU.mem.data[effAddrAbsY];
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_INX: {
+				int addrIX = FetchByte(CPU.ciclos, CPU.mem);
+				addrIX += X;
+				CPU.ciclos--;
+				while (addrIX >= 256) {
+					addrIX -= 256;
+				}
+
+				int effAddr = readWord(CPU.ciclos, addrIX, CPU.mem);
+				A |= CPU.mem.data[effAddr];
+				CPU.ciclos--;
+				LDASetStatus();
+				break;
+			}
+			case INS_ORA_INY: {
+				int addrIY = FetchByte(CPU.ciclos, CPU.mem);
+				while (addrIY >= 256) {
+					addrIY -= 256;
+				} // F0
+
+				int effAddr = readWord(CPU.ciclos, addrIY, CPU.mem);
+				effAddr += Y;
+				CPU.ciclos--;
+
+				A |= CPU.mem.data[effAddr];
+				CPU.ciclos--;
+				LDASetStatus();
+
+				break;
 			}
 			default:
 

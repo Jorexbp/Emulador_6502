@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class OR_IM_ZP_ZPX_AB_ABX_ABY_INX_INY {
+public class ORA_IM_ZP_ZPX_AB_ABX_ABY_INX_INY {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -24,10 +24,10 @@ public class OR_IM_ZP_ZPX_AB_ABX_ABY_INX_INY {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { OPCODES.INS_EOR_IM.opcodeValue, 2 }, { OPCODES.INS_EOR_ZP.opcodeValue, 3 },
-				{ OPCODES.INS_EOR_ZPX.opcodeValue, 4 }, { OPCODES.INS_EOR_AB.opcodeValue, 4 },
-				{ OPCODES.INS_EOR_ABX.opcodeValue, 4 }, { OPCODES.INS_EOR_ABY.opcodeValue, 3 },
-				{ OPCODES.INS_EOR_INX.opcodeValue, 6 }, { OPCODES.INS_EOR_INY.opcodeValue, 6 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_ORA_IM.opcodeValue, 2 }, { OPCODES.INS_ORA_ZP.opcodeValue, 3 },
+				{ OPCODES.INS_ORA_ZPX.opcodeValue, 4 }, { OPCODES.INS_ORA_AB.opcodeValue, 4 },
+				{ OPCODES.INS_ORA_ABX.opcodeValue, 4 }, { OPCODES.INS_ORA_ABY.opcodeValue, 3 },
+				{ OPCODES.INS_ORA_INX.opcodeValue, 6 }, { OPCODES.INS_ORA_INY.opcodeValue, 6 } };
 
 		return Arrays.asList(data);
 	}
@@ -54,43 +54,43 @@ public class OR_IM_ZP_ZPX_AB_ABX_ABY_INX_INY {
 
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
-		if (OPCODE == OPCODES.INS_EOR_IM.opcodeValue) {
+		if (OPCODE == OPCODES.INS_ORA_IM.opcodeValue) {
 			assertEquals(CPU.A, 0x66);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_ZP.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_ZP.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_ZPX.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_ZPX.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_AB.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_AB.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_ABX.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_ABX.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_ABY.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_ABY.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_INX.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_INX.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
-		} else if (OPCODE == OPCODES.INS_EOR_INY.opcodeValue) {
-			assertEquals(CPU.A, 0x6A);
+		} else if (OPCODE == OPCODES.INS_ORA_INY.opcodeValue) {
+			assertEquals(CPU.A, 0x6E);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, true);
 
