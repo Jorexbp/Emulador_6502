@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class AND_IM_ZP_ZPX {
+public class AND_IM_ZP_ZPX_AB_INX_INY {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -25,7 +25,10 @@ public class AND_IM_ZP_ZPX {
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { { OPCODES.INS_AND_IM.opcodeValue, 2 }, { OPCODES.INS_AND_ZP.opcodeValue, 3 },
-				{ OPCODES.INS_AND_ZPX.opcodeValue, 4 } };
+				{ OPCODES.INS_AND_ZPX.opcodeValue, 4 }, { OPCODES.INS_AND_AB.opcodeValue, 4 },
+				{ OPCODES.INS_AND_ABX.opcodeValue, 4 }, { OPCODES.INS_AND_ABY.opcodeValue, 3 },
+				{ OPCODES.INS_AND_INX.opcodeValue, 6 }, { OPCODES.INS_AND_INY.opcodeValue, 6 } };
+
 		return Arrays.asList(data);
 	}
 
@@ -34,12 +37,20 @@ public class AND_IM_ZP_ZPX {
 		cpu.reset(0xFFFC, mem);
 		CPU.A = 0x64;
 		CPU.X = 0x02;
+		CPU.Y = 0x04;
+
 		CPU copiaCPU = cpu;
 
 		CPU.mem.data[0xFFFC] = OPCODE;
-		CPU.mem.data[0xFFFD] = 0x02;
-		CPU.mem.data[0x02] = 0x0E;
-		CPU.mem.data[0x04] = 0x0E;
+		CPU.mem.data[0xFFFD] = 0xFF02; // IM
+		CPU.mem.data[0x02] = 0x0E; // ZP
+		CPU.mem.data[0x04] = 0x0E; // ZPX // INX efAddr
+		CPU.mem.data[0xFF02] = 0x0E; // AB
+		CPU.mem.data[0xFF04] = 0x0E; // ABX
+		CPU.mem.data[0xFF06] = 0x0E; // ABY
+		CPU.mem.data[0x0E] = 0x0E; // INX [efAddr]
+
+		CPU.mem.data[0x12] = 0x0E; // INY [efAddr]
 
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
@@ -54,6 +65,31 @@ public class AND_IM_ZP_ZPX {
 			assertEquals(cpu.N, false);
 
 		} else if (OPCODE == OPCODES.INS_AND_ZPX.opcodeValue) {
+			assertEquals(CPU.A, 0x04);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.N, false);
+
+		} else if (OPCODE == OPCODES.INS_AND_AB.opcodeValue) {
+			assertEquals(CPU.A, 0x04);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.N, false);
+
+		} else if (OPCODE == OPCODES.INS_AND_ABX.opcodeValue) {
+			assertEquals(CPU.A, 0x04);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.N, false);
+
+		} else if (OPCODE == OPCODES.INS_AND_ABY.opcodeValue) {
+			assertEquals(CPU.A, 0x04);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.N, false);
+
+		} else if (OPCODE == OPCODES.INS_AND_INX.opcodeValue) {
+			assertEquals(CPU.A, 0x04);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.N, false);
+
+		} else if (OPCODE == OPCODES.INS_AND_INY.opcodeValue) {
 			assertEquals(CPU.A, 0x04);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.N, false);
