@@ -17,7 +17,8 @@ public class CPU {
 
 	// status flags
 
-	public int D, C, I, B, V, Un;
+	public int D, C, I, B, Un;
+	public boolean V;
 	public boolean N;
 	public boolean Z;
 
@@ -41,7 +42,7 @@ public class CPU {
 		I = 0;
 		Un = 0;
 		B = 0;
-		V = 0;
+		V = false;
 		N = false;
 		CPU.mem = mem2;
 		ProcesorStatus();
@@ -72,8 +73,10 @@ public class CPU {
 	public void ProcesorStatus() {
 		int zbit = (Z == true) ? 1 : 0;
 		int nbit = (N == true) ? 1 : 0;
+		int vbit = (V == true) ? 1 : 0;
+
 		String bits = String.valueOf(C).concat(String.valueOf(zbit)).concat(String.valueOf(I)).concat(String.valueOf(D))
-				.concat(String.valueOf(B)).concat(String.valueOf(Un)).concat(String.valueOf(V))
+				.concat(String.valueOf(B)).concat(String.valueOf(Un)).concat(String.valueOf(vbit))
 				.concat(String.valueOf(nbit));
 		PS = Integer.parseInt(bits, 2);
 		// System.out.println(bits);
@@ -757,20 +760,20 @@ public class CPU {
 					ZeroPageAddr -= 256;
 				}
 				int valor = readByte(CPU.ciclos, ZeroPageAddr, CPU.mem);
-				Z = (A & valor) == 0;
-//				PS |= (valor & 0b1100000);
-				V = (valor & 0b010000);
-				N = (valor & 0b100000) > 0;
+				Z = (A & valor) != 0;
+				// PS |= (valor & 0b1100000);
+				V = (valor & 0b01000000) != 0;
+				N = (valor & 0b10000000) != 0;
 				break;
 			}
 			case INS_BIT_AB: {
 				int addr = FetchWord(CPU.ciclos, CPU.mem);
 
 				int valor = readByte(CPU.ciclos, addr, CPU.mem);
-				Z = (A & valor) == 0;
+				Z = (A & valor) != 0;
 				// PS |= (valor & 0b1100000);
-				V = (valor & 0b010000);
-				N = (valor & 0b100000) > 0;
+				V = (valor & 0b010000) != 0;
+				N = (valor & 0b100000) != 0;
 				break;
 			}
 			case INS_CLC_IM: {
@@ -789,7 +792,7 @@ public class CPU {
 				break;
 			}
 			case INS_CLV_IM: {
-				V = 0;
+				V = false;
 				CPU.ciclos--;
 				break;
 			}

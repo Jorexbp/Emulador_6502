@@ -35,7 +35,7 @@ public class CLC_CLD_CLI_CLV_SEC_SED_SEI {
 		cpu.reset(0xFF00, mem);
 		CPU copiaCPU = cpu;
 		cpu.C = 1;
-		cpu.V = 1;
+		cpu.V = true;
 		cpu.I = 1;
 		cpu.D = 1;
 
@@ -53,7 +53,7 @@ public class CLC_CLD_CLI_CLV_SEC_SED_SEI {
 			assertEquals(cpu.I, 0);
 
 		} else if (OPCODE == OPCODES.INS_CLV_IM.opcodeValue) {
-			assertEquals(cpu.V, 0);
+			assertEquals(cpu.V, false);
 
 		} 
 		assertEquals(cpu.N, false);
