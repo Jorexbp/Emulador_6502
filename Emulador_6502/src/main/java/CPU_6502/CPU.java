@@ -76,6 +76,7 @@ public class CPU {
 				.concat(String.valueOf(B)).concat(String.valueOf(Un)).concat(String.valueOf(V))
 				.concat(String.valueOf(nbit));
 		PS = Integer.parseInt(bits, 2);
+		// System.out.println(bits);
 	}
 
 	public int execute(int ciclos, Mem mem) {
@@ -759,20 +760,54 @@ public class CPU {
 				Z = (A & valor) == 0;
 //				PS |= (valor & 0b1100000);
 				V = (valor & 0b010000);
-				N = (valor & 0b100000)>0;
+				N = (valor & 0b100000) > 0;
 				break;
 			}
 			case INS_BIT_AB: {
 				int addr = FetchWord(CPU.ciclos, CPU.mem);
-				
+
 				int valor = readByte(CPU.ciclos, addr, CPU.mem);
 				Z = (A & valor) == 0;
-				//PS |= (valor & 0b1100000);
+				// PS |= (valor & 0b1100000);
 				V = (valor & 0b010000);
-				N = (valor & 0b100000)>0;
+				N = (valor & 0b100000) > 0;
 				break;
 			}
-			
+			case INS_CLC_IM: {
+				C = 0;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_CLD_IM: {
+				D = 0;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_CLI_IM: {
+				I = 0;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_CLV_IM: {
+				V = 0;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_SEC_IM: {
+				C = 1;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_SED_IM: {
+				D = 1;
+				CPU.ciclos--;
+				break;
+			}
+			case INS_SEI_IM: {
+				I = 1;
+				CPU.ciclos--;
+				break;
+			}
 			default:
 
 				break;
