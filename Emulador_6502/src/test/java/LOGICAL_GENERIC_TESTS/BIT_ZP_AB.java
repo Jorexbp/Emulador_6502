@@ -34,7 +34,8 @@ public class BIT_ZP_AB {
 	public void test() {
 		cpu.reset(0xFFFC, mem);
 		CPU.A = 0x33;
-
+cpu.V = false;
+cpu.N = true;
 		CPU copiaCPU = cpu;
 
 		CPU.mem.data[0xFFFC] = OPCODE;
@@ -47,11 +48,13 @@ public class BIT_ZP_AB {
 			assertEquals(CPU.A, 0x33);
 			assertEquals(cpu.Z, false); // err
 			assertEquals(cpu.N, true);
+			assertEquals(cpu.V, true);
 
 		} else if (OPCODE == OPCODES.INS_BIT_AB.opcodeValue) {
 			assertEquals(CPU.A, 0x33); // 11001100 - 204
 			assertEquals(cpu.Z, false); // & = 0
 			assertEquals(cpu.N, false);// 7b -1
+			assertEquals(cpu.V, false);
 
 		}
 
