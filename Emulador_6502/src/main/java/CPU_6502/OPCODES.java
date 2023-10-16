@@ -53,9 +53,14 @@ public enum OPCODES {
 	INS_ORA_INX(0x01), INS_ORA_INY(0x11),
 	// BIT TEST
 	INS_BIT_ZP(0x24), INS_BIT_AB(0x2C),
-	
+
 	// CAMBIOS DE LAS FLAGS
-	INS_CLC_IM(0x18),INS_CLD_IM(0xD8),INS_CLI_IM(0x58),INS_CLV_IM(0xB8),INS_SEC_IM(0x38),INS_SED_IM(0xF8),INS_SEI_IM(0x78);
+	INS_CLC_IM(0x18), INS_CLD_IM(0xD8), INS_CLI_IM(0x58), INS_CLV_IM(0xB8), INS_SEC_IM(0x38), INS_SED_IM(0xF8),
+	INS_SEI_IM(0x78),
+
+	// ARITMÉTICAS
+	INS_ADC_IM(0x69), INS_ADC_ZP(0x65), INS_ADC_ZPX(0x75), INS_ADC_AB(0x6D), INS_ADC_ABX(0x7D), INS_ADC_ABY(0x79),
+	INS_ADC_INX(0x61), INS_ADC_INY(0x71);
 
 	public final int opcodeValue;
 
@@ -69,7 +74,7 @@ public enum OPCODES {
 				return country;
 			}
 		}
-		
+
 		throw new IllegalArgumentException();
 	}
 }
