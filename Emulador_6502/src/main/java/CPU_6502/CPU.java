@@ -1,5 +1,7 @@
 package CPU_6502;
 
+import Excepciones.Excepcion_Instruccion;
+
 public class CPU {
 	// byte[] Dbyte = new byte[8];
 	// byte[] DWord = new byte[16];
@@ -17,7 +19,8 @@ public class CPU {
 
 	// status flags
 
-	public int D, C, I, B, Un;
+	public int D, I, B, Un;
+	public boolean C;
 	public boolean V;
 	public boolean N;
 	public boolean Z;
@@ -37,7 +40,7 @@ public class CPU {
 		A = 0;
 		X = 0;
 		Y = 0;
-		C = 0;
+		C = false;
 		Z = false;
 		I = 0;
 		Un = 0;
@@ -70,14 +73,24 @@ public class CPU {
 
 	}
 
+	private void ADCSetStatus() {
+		// V = ();
+		C = V ? true : false;
+		Z = (A == 0);
+		N = (A & 0b1000000) > 0;
+		ProcesorStatus();
+
+	}
+
 	public void ProcesorStatus() {
 		int zbit = (Z == true) ? 1 : 0;
 		int nbit = (N == true) ? 1 : 0;
 		int vbit = (V == true) ? 1 : 0;
+		int cbit = (C == true) ? 1 : 0;
 
-		String bits = String.valueOf(C).concat(String.valueOf(zbit)).concat(String.valueOf(I)).concat(String.valueOf(D))
-				.concat(String.valueOf(B)).concat(String.valueOf(Un)).concat(String.valueOf(vbit))
-				.concat(String.valueOf(nbit));
+		String bits = String.valueOf(cbit).concat(String.valueOf(zbit)).concat(String.valueOf(I))
+				.concat(String.valueOf(D)).concat(String.valueOf(B)).concat(String.valueOf(Un))
+				.concat(String.valueOf(vbit)).concat(String.valueOf(nbit));
 		PS = Integer.parseInt(bits, 2);
 		// System.out.println(bits);
 	}
@@ -90,730 +103,745 @@ public class CPU {
 			// System.out.println("Ciclo: "+CPU.ciclos);
 
 			int ins = FetchByte(ciclos, mem);
-			switch (OPCODES.getOPCODE(ins)) {
+			try {
+				switch (OPCODES.getOPCODE(ins)) {
 
-			case INS_LDA_IM: {
+				case INS_LDA_IM: {
 
-				int val = FetchByte(ciclos, mem);
+					int val = FetchByte(ciclos, mem);
 
-				while (val >= 256) {
-					val -= 256;
+					while (val >= 256) {
+						val -= 256;
+					}
+					// System.out.println(val);
+					A = val;
+					LDASetStatus();
+
+					break;
 				}
-				// System.out.println(val);
-				A = val;
-				LDASetStatus();
+				case INS_LDA_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
 
-				break;
-			}
-			case INS_LDA_ZP: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
+					A = readByte(ciclos, ZeroPageAddr, mem);
+					LDASetStatus();
+					break;
 				}
+				case INS_LDA_ZX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
 
-				A = readByte(ciclos, ZeroPageAddr, mem);
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_ZX: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				A = readByte(ciclos, ZeroPageAddr, mem);
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-
-				A = readByte(ciclos, addrAbs, mem);
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_AX: {
-				int addrAbs = FetchWord(ciclos, mem);
-
-				int effAddrAbsX = addrAbs + X;
-				A = readByte(ciclos, effAddrAbsX, mem);
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					A = readByte(ciclos, ZeroPageAddr, mem);
+					LDASetStatus();
+					break;
 				}
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_AY: {
-				int addrAbs = FetchWord(ciclos, mem);
-				int effAddrAbsY = addrAbs + Y;
-				A = readByte(ciclos, effAddrAbsY, mem);
+				case INS_LDA_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
 
-				if (effAddrAbsY - addrAbs >= 0xFF) {
+					A = readByte(ciclos, addrAbs, mem);
+					LDASetStatus();
+					break;
+				}
+				case INS_LDA_AX: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsX = addrAbs + X;
+					A = readByte(ciclos, effAddrAbsX, mem);
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					LDASetStatus();
+					break;
+				}
+				case INS_LDA_AY: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsY = addrAbs + Y;
+					A = readByte(ciclos, effAddrAbsY, mem);
+
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					LDASetStatus();
+					break;
+				}
+				case INS_LDA_IX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
 					CPU.ciclos--;
+					int effAddr = readWord(ciclos, addrIX, mem);
+					A = readByte(ciclos, effAddr, mem);
+					LDASetStatus();
+					break;
 				}
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_IX: {
-				int addrIX = FetchByte(ciclos, mem);
-				addrIX += X;
-				while (addrIX >= 256) {
-					addrIX -= 256;
-				}
-				CPU.ciclos--;
-				int effAddr = readWord(ciclos, addrIX, mem);
-				A = readByte(ciclos, effAddr, mem);
-				LDASetStatus();
-				break;
-			}
-			case INS_LDA_IY: {
-				int addrIY = FetchByte(ciclos, mem);
-				while (addrIY >= 256) {
-					addrIY -= 256;
-				} // F0
-				int effAddr = readWord(ciclos, addrIY, mem);
-				effAddr += Y;
+				case INS_LDA_IY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
 
-				A = readByte(ciclos, effAddr, mem);
+					A = readByte(ciclos, effAddr, mem);
 
-				LDASetStatus();
-				break;
-			}
-			case INS_LDX_IM: {
-				int val = FetchByte(ciclos, mem);
-				while (val >= 256) {
-					val -= 256;
+					LDASetStatus();
+					break;
 				}
-				X = val;
-				LDXSetStatus();
-				break;
-			}
-			case INS_LDX_ZP: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDX_IM: {
+					int val = FetchByte(ciclos, mem);
+					while (val >= 256) {
+						val -= 256;
+					}
+					X = val;
+					LDXSetStatus();
+					break;
 				}
-				X = readByte(ciclos, ZeroPageAddr, mem);
-				LDXSetStatus();
-				break;
-			}
-			case INS_LDX_ZPY: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += Y;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDX_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					X = readByte(ciclos, ZeroPageAddr, mem);
+					LDXSetStatus();
+					break;
 				}
-				CPU.ciclos--;
-				X = readByte(ciclos, ZeroPageAddr, mem);
-				LDXSetStatus();
-				break;
-			}
-			case INS_LDX_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-				X = readByte(ciclos, addrAbs, mem);
-				LDXSetStatus();
-				break;
-			}
-			case INS_LDX_ABY: {
-				int addrAbs = FetchWord(ciclos, mem);
-				int effAddrAbsX = addrAbs + Y;
-				X = readByte(ciclos, effAddrAbsX, mem);
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+				case INS_LDX_ZPY: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += Y;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					X = readByte(ciclos, ZeroPageAddr, mem);
+					LDXSetStatus();
+					break;
 				}
-				LDXSetStatus();
-				break;
-			}
-			case INS_LDY_IM: {
-				int val = FetchByte(ciclos, mem);
-				while (val >= 256) {
-					val -= 256;
+				case INS_LDX_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					X = readByte(ciclos, addrAbs, mem);
+					LDXSetStatus();
+					break;
 				}
-				Y = val;
-				LDYSetStatus();
-				break;
-			}
-			case INS_LDY_ZP: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDX_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + Y;
+					X = readByte(ciclos, effAddrAbsX, mem);
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					LDXSetStatus();
+					break;
 				}
-				Y = readByte(ciclos, ZeroPageAddr, mem);
-				LDYSetStatus();
-				break;
-			}
-			case INS_LDY_ZPX: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDY_IM: {
+					int val = FetchByte(ciclos, mem);
+					while (val >= 256) {
+						val -= 256;
+					}
+					Y = val;
+					LDYSetStatus();
+					break;
 				}
-				CPU.ciclos--;
-				Y = readByte(ciclos, ZeroPageAddr, mem);
-				LDYSetStatus();
-				break;
-			}
-			case INS_LDY_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-				Y = readByte(ciclos, addrAbs, mem);
-				LDYSetStatus();
-				break;
-			}
-			case INS_LDY_ABX: {
-				int addrAbs = FetchWord(ciclos, mem);
-				int effAddrAbsX = addrAbs + X;
-				Y = readByte(ciclos, effAddrAbsX, mem);
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+				case INS_LDY_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					Y = readByte(ciclos, ZeroPageAddr, mem);
+					LDYSetStatus();
+					break;
+				}
+				case INS_LDY_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					Y = readByte(ciclos, ZeroPageAddr, mem);
+					LDYSetStatus();
+					break;
 				}
-				LDYSetStatus();
-				break;
-			}
-			case INS_STA_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDY_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					Y = readByte(ciclos, addrAbs, mem);
+					LDYSetStatus();
+					break;
 				}
-
-				writeByte(A, ZeroPageAddr, ciclos);
-
-				break;
-			}
-			case INS_STA_ZPX: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
+				case INS_LDY_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + X;
+					Y = readByte(ciclos, effAddrAbsX, mem);
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					LDYSetStatus();
+					break;
 				}
-				CPU.ciclos--;
-				writeByte(A, ZeroPageAddr, ciclos);
+				case INS_STA_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 
-				break;
-			}
-			case INS_STA_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-				writeByte(A, addrAbs, ciclos);
-				break;
-			}
-			case INS_STA_ABX: {
-				int addrAbs = FetchWord(ciclos, mem);
-				int effAddrAbsX = addrAbs + X;
-				CPU.ciclos--;
-				writeByte(A, effAddrAbsX, ciclos);
+					writeByte(A, ZeroPageAddr, ciclos);
 
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+					break;
+				}
+				case INS_STA_ZPX: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					writeByte(A, ZeroPageAddr, ciclos);
+
+					break;
 				}
-
-				break;
-			}
-			case INS_STA_ABY: {
-				int addrAbs = FetchWord(ciclos, mem);
-				int effAddrAbsX = addrAbs + Y;
-				CPU.ciclos--;
-				writeByte(A, effAddrAbsX, ciclos);
-
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+				case INS_STA_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					writeByte(A, addrAbs, ciclos);
+					break;
+				}
+				case INS_STA_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + X;
 					CPU.ciclos--;
+					writeByte(A, effAddrAbsX, ciclos);
+
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+
+					break;
 				}
-
-				break;
-			}
-			case INS_STA_INX: {
-				int addrIX = FetchByte(ciclos, mem);
-				addrIX += X;
-				CPU.ciclos--;
-				while (addrIX >= 256) {
-					addrIX -= 256;
-				}
-
-				int effAddr = readWord(ciclos, addrIX, mem);
-				writeByte(A, effAddr, ciclos);
-
-				break;
-			}
-			case INS_STA_INY: {
-				int addrIY = FetchByte(ciclos, mem);
-				while (addrIY >= 256) {
-					addrIY -= 256;
-				} // F0
-
-				int effAddr = readWord(ciclos, addrIY, mem);
-				effAddr += Y;
-				CPU.ciclos--;
-
-				writeByte(A, effAddr, ciclos);
-
-				break;
-			}
-			case INS_STX_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-
-				writeByte(X, ZeroPageAddr, ciclos);
-
-				break;
-			}
-			case INS_STX_ZPY: { // 4 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += Y;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				writeByte(X, ZeroPageAddr, ciclos);
-				break;
-			}
-			case INS_STX_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-				writeByte(X, addrAbs, ciclos);
-
-				break;
-			}
-			case INS_STY_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-
-				writeByte(Y, ZeroPageAddr, ciclos);
-
-				break;
-			}
-			case INS_STY_ZPX: { // 4 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				writeByte(Y, ZeroPageAddr, ciclos);
-				break;
-			}
-			case INS_STY_AB: {
-				int addrAbs = FetchWord(ciclos, mem);
-				writeByte(Y, addrAbs, ciclos);
-
-				break;
-			}
-
-			case INS_TAX_IP: {
-				X = A;
-				CPU.ciclos--;
-				LDXSetStatus();
-				break;
-			}
-			case INS_TAY_IP: {
-				Y = A;
-				CPU.ciclos--;
-				LDYSetStatus();
-				break;
-			}
-			case INS_TXA_IP: {
-				A = X;
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_TYA_IP: {
-				A = Y;
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_JSR: {
-				int JSRaddr = FetchWord(ciclos, mem);
-				PushPCToStack(ciclos);
-
-				PC = JSRaddr;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_RTS: {
-
-				PC = PopWordFromStack() + 1;
-				CPU.ciclos -= 2;
-				break;
-			}
-			case INS_JMP_AB: {
-				int addr = FetchWord(ciclos, mem);
-				PC = addr;
-
-				break;
-			}
-			case INS_JMP_IN: {
-				int addr = FetchWord(ciclos, mem);
-				addr = readWord(ciclos, addr, mem);
-				PC = addr;
-
-				break;
-			}
-			case INS_TSX_IM: { // 2 c
-				X = SP;
-				CPU.ciclos--;
-
-				LDXSetStatus();
-				break;
-			}
-			case INS_TXS_IM: { // 2 c
-				SP = X;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_PHA_IM: { // 3 c
-				PushByteToStack(A);
-				break;
-			}
-
-			case INS_PLA_IM: { // 4 c
-				A = PopWordFromStack();
-				LDASetStatus();
-				break;
-			}
-			case INS_PLP_IM: { // 3 c
-				PS = PopWordFromStack();
-				break;
-			}
-			case INS_PHP_IM: { // 3 c
-				PushByteToStack(PS);
-				break;
-			}
-			case INS_AND_IM: { // 2 c
-				A &= FetchByte(ciclos, mem);
-				LDASetStatus();
-
-				// 0 true, 1 false
-				break;
-			}
-			case INS_AND_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				CPU.ciclos--;
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
-				}
-				A &= mem.data[ZeroPageAddr];
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_ZPX: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				A &= mem.data[ZeroPageAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_AB: {
-				int addr = FetchWord(ciclos, mem);
-				A &= mem.data[addr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_ABX: {
-				int addrAbs = FetchWord(ciclos, mem);
-
-				int effAddrAbsX = addrAbs + X;
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+				case INS_STA_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + Y;
 					CPU.ciclos--;
-				}
-				A &= mem.data[effAddrAbsX];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_ABY: {
-				int addrAbs = FetchWord(ciclos, mem);
+					writeByte(A, effAddrAbsX, ciclos);
 
-				int effAddrAbsY = addrAbs + Y;
-				if (effAddrAbsY - addrAbs >= 0xFF) {
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+
+					break;
+				}
+				case INS_STA_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
 					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					writeByte(A, effAddr, ciclos);
+
+					break;
 				}
-				A &= mem.data[effAddrAbsY];
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_INX: {
-				int addrIX = FetchByte(ciclos, mem);
-				addrIX += X;
-				CPU.ciclos--;
-				while (addrIX >= 256) {
-					addrIX -= 256;
-				}
+				case INS_STA_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
 
-				int effAddr = readWord(ciclos, addrIX, mem);
-				A &= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_AND_INY: {
-				int addrIY = FetchByte(ciclos, mem);
-				while (addrIY >= 256) {
-					addrIY -= 256;
-				} // F0
-
-				int effAddr = readWord(ciclos, addrIY, mem);
-				effAddr += Y;
-				CPU.ciclos--;
-
-				A &= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-
-				break;
-			}
-			case INS_EOR_IM: { // 2 c
-				int byteValue = FetchByte(ciclos, mem);
-				while (byteValue >= 256) {
-					byteValue -= 256;
-				}
-				A ^= byteValue;
-
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				CPU.ciclos--;
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
-				}
-				A ^= mem.data[ZeroPageAddr];
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_ZPX: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				A ^= mem.data[ZeroPageAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_AB: {
-				int addr = FetchWord(ciclos, mem);
-				A ^= mem.data[addr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_ABX: {
-				int addrAbs = FetchWord(ciclos, mem);
-
-				int effAddrAbsX = addrAbs + X;
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
 					CPU.ciclos--;
-				}
-				A ^= mem.data[effAddrAbsX];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_ABY: {
-				int addrAbs = FetchWord(ciclos, mem);
 
-				int effAddrAbsY = addrAbs + Y;
-				if (effAddrAbsY - addrAbs >= 0xFF) {
+					writeByte(A, effAddr, ciclos);
+
+					break;
+				}
+				case INS_STX_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
+
+					writeByte(X, ZeroPageAddr, ciclos);
+
+					break;
+				}
+				case INS_STX_ZPY: { // 4 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += Y;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					writeByte(X, ZeroPageAddr, ciclos);
+					break;
 				}
-				A ^= mem.data[effAddrAbsY];
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_INX: {
-				int addrIX = FetchByte(ciclos, mem);
-				addrIX += X;
-				CPU.ciclos--;
-				while (addrIX >= 256) {
-					addrIX -= 256;
+				case INS_STX_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					writeByte(X, addrAbs, ciclos);
+
+					break;
 				}
+				case INS_STY_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 
-				int effAddr = readWord(ciclos, addrIX, mem);
-				A ^= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_EOR_INY: {
-				int addrIY = FetchByte(ciclos, mem);
-				while (addrIY >= 256) {
-					addrIY -= 256;
-				} // F0
+					writeByte(Y, ZeroPageAddr, ciclos);
 
-				int effAddr = readWord(ciclos, addrIY, mem);
-				effAddr += Y;
-				CPU.ciclos--;
-
-				A ^= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-
-				break;
-			}
-			case INS_ORA_IM: { // 2 c
-				int byteValue = FetchByte(ciclos, mem);
-				while (byteValue >= 256) {
-					byteValue -= 256;
+					break;
 				}
-				A |= byteValue;
-
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_ZP: { // 3 c
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				CPU.ciclos--;
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
-				}
-				A |= mem.data[ZeroPageAddr];
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_ZPX: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				ZeroPageAddr += X;
-				while (ZeroPageAddr > 256) {
-					ZeroPageAddr -= 256;
-				}
-				CPU.ciclos--;
-				A |= mem.data[ZeroPageAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_AB: {
-				int addr = FetchWord(ciclos, mem);
-				A |= mem.data[addr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_ABX: {
-				int addrAbs = FetchWord(ciclos, mem);
-
-				int effAddrAbsX = addrAbs + X;
-				if (effAddrAbsX - addrAbs >= 0xFF) {
+				case INS_STY_ZPX: { // 4 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
 					CPU.ciclos--;
+					writeByte(Y, ZeroPageAddr, ciclos);
+					break;
 				}
-				A |= mem.data[effAddrAbsX];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_ABY: {
-				int addrAbs = FetchWord(ciclos, mem);
+				case INS_STY_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					writeByte(Y, addrAbs, ciclos);
 
-				int effAddrAbsY = addrAbs + Y;
-				if (effAddrAbsY - addrAbs >= 0xFF) {
+					break;
+				}
+
+				case INS_TAX_IP: {
+					X = A;
 					CPU.ciclos--;
+					LDXSetStatus();
+					break;
 				}
-				A |= mem.data[effAddrAbsY];
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_INX: {
-				int addrIX = FetchByte(ciclos, mem);
-				addrIX += X;
-				CPU.ciclos--;
-				while (addrIX >= 256) {
-					addrIX -= 256;
+				case INS_TAY_IP: {
+					Y = A;
+					CPU.ciclos--;
+					LDYSetStatus();
+					break;
+				}
+				case INS_TXA_IP: {
+					A = X;
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_TYA_IP: {
+					A = Y;
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_JSR: {
+					int JSRaddr = FetchWord(ciclos, mem);
+					PushPCToStack(ciclos);
+
+					PC = JSRaddr;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_RTS: {
+
+					PC = PopWordFromStack() + 1;
+					CPU.ciclos -= 2;
+					break;
+				}
+				case INS_JMP_AB: {
+					int addr = FetchWord(ciclos, mem);
+					PC = addr;
+
+					break;
+				}
+				case INS_JMP_IN: {
+					int addr = FetchWord(ciclos, mem);
+					addr = readWord(ciclos, addr, mem);
+					PC = addr;
+
+					break;
+				}
+				case INS_TSX_IM: { // 2 c
+					X = SP;
+					CPU.ciclos--;
+
+					LDXSetStatus();
+					break;
+				}
+				case INS_TXS_IM: { // 2 c
+					SP = X;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_PHA_IM: { // 3 c
+					PushByteToStack(A);
+					break;
 				}
 
-				int effAddr = readWord(ciclos, addrIX, mem);
-				A |= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-				break;
-			}
-			case INS_ORA_INY: {
-				int addrIY = FetchByte(ciclos, mem);
-				while (addrIY >= 256) {
-					addrIY -= 256;
-				} // F0
-
-				int effAddr = readWord(ciclos, addrIY, mem);
-				effAddr += Y;
-				CPU.ciclos--;
-
-				A |= mem.data[effAddr];
-				CPU.ciclos--;
-				LDASetStatus();
-
-				break;
-			}
-			case INS_BIT_ZP: {
-				int ZeroPageAddr = FetchByte(ciclos, mem);
-				while (ZeroPageAddr >= 256) {
-					ZeroPageAddr -= 256;
+				case INS_PLA_IM: { // 4 c
+					A = PopWordFromStack();
+					LDASetStatus();
+					break;
 				}
-				int valor = readByte(ciclos, ZeroPageAddr, mem);
-				Z = (A & valor) != 0;
-				// PS |= (valor & 0b1100000);
-				V = (valor & 0b01000000) != 0;
-				N = (valor & 0b10000000) != 0;
-				break;
-			}
-			case INS_BIT_AB: {
-				int addr = FetchWord(ciclos, mem);
+				case INS_PLP_IM: { // 3 c
+					PS = PopWordFromStack();
+					break;
+				}
+				case INS_PHP_IM: { // 3 c
+					PushByteToStack(PS);
+					break;
+				}
+				case INS_AND_IM: { // 2 c
+					A &= FetchByte(ciclos, mem);
+					LDASetStatus();
 
-				int valor = readByte(ciclos, addr, mem);
-				Z = (A & valor) != 0;
-				V = (valor & 0b0100000) != 0;
-				N = (valor & 0b1000000) != 0;
-				break;
-			}
-			case INS_CLC_IM: {
-				C = 0;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_CLD_IM: {
-				D = 0;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_CLI_IM: {
-				I = 0;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_CLV_IM: {
-				V = false;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_SEC_IM: {
-				C = 1;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_SED_IM: {
-				D = 1;
-				CPU.ciclos--;
-				break;
-			}
-			case INS_SEI_IM: {
-				I = 1;
-				CPU.ciclos--;
-				break;
-			}
-			default:
+					// 0 true, 1 false
+					break;
+				}
+				case INS_AND_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					CPU.ciclos--;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					A &= mem.data[ZeroPageAddr];
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
+					CPU.ciclos--;
+					A &= mem.data[ZeroPageAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_AB: {
+					int addr = FetchWord(ciclos, mem);
+					A &= mem.data[addr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
 
-				break;
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A &= mem.data[effAddrAbsX];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsY = addrAbs + Y;
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A &= mem.data[effAddrAbsY];
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					A &= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_AND_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+
+					A &= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+
+					break;
+				}
+				case INS_EOR_IM: { // 2 c
+					int byteValue = FetchByte(ciclos, mem);
+					while (byteValue >= 256) {
+						byteValue -= 256;
+					}
+					A ^= byteValue;
+
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					CPU.ciclos--;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					A ^= mem.data[ZeroPageAddr];
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
+					CPU.ciclos--;
+					A ^= mem.data[ZeroPageAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_AB: {
+					int addr = FetchWord(ciclos, mem);
+					A ^= mem.data[addr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A ^= mem.data[effAddrAbsX];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsY = addrAbs + Y;
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A ^= mem.data[effAddrAbsY];
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					A ^= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_EOR_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+
+					A ^= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+
+					break;
+				}
+				case INS_ORA_IM: { // 2 c
+					int byteValue = FetchByte(ciclos, mem);
+					while (byteValue >= 256) {
+						byteValue -= 256;
+					}
+					A |= byteValue;
+
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_ZP: { // 3 c
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					CPU.ciclos--;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					A |= mem.data[ZeroPageAddr];
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr > 256) {
+						ZeroPageAddr -= 256;
+					}
+					CPU.ciclos--;
+					A |= mem.data[ZeroPageAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_AB: {
+					int addr = FetchWord(ciclos, mem);
+					A |= mem.data[addr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A |= mem.data[effAddrAbsX];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+
+					int effAddrAbsY = addrAbs + Y;
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					A |= mem.data[effAddrAbsY];
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					A |= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+					break;
+				}
+				case INS_ORA_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+
+					A |= mem.data[effAddr];
+					CPU.ciclos--;
+					LDASetStatus();
+
+					break;
+				}
+				case INS_BIT_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					int valor = readByte(ciclos, ZeroPageAddr, mem);
+					Z = (A & valor) != 0;
+					// PS |= (valor & 0b1100000);
+					V = (valor & 0b01000000) != 0;
+					N = (valor & 0b10000000) != 0;
+					break;
+				}
+				case INS_BIT_AB: {
+					int addr = FetchWord(ciclos, mem);
+
+					int valor = readByte(ciclos, addr, mem);
+					Z = (A & valor) != 0;
+					V = (valor & 0b0100000) != 0;
+					N = (valor & 0b1000000) != 0;
+					break;
+				}
+				case INS_CLC_IM: {
+					C = false;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_CLD_IM: {
+					D = 0;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_CLI_IM: {
+					I = 0;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_CLV_IM: {
+					V = false;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_SEC_IM: {
+					C = true;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_SED_IM: {
+					D = 1;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_SEI_IM: {
+					I = 1;
+					CPU.ciclos--;
+					break;
+				}
+				case INS_ADC_AB: {
+					int addr = FetchWord(CPU.ciclos, CPU.mem);
+					int oper = readByte(CPU.ciclos, addr, CPU.mem);
+					A += oper;
+					A += C ? 1 : 0; // Probablemente mal
+					N = false;
+					C = false;
+					V = false;
+					ADCSetStatus();
+					break;
+				}
+				default:
+
+					break;
+				}
+			} catch (Excepcion_Instruccion e) {
+				e.printStackTrace();
 			}
 
 		}

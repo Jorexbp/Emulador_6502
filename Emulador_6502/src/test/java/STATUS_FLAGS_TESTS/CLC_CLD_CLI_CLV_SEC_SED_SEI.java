@@ -34,7 +34,7 @@ public class CLC_CLD_CLI_CLV_SEC_SED_SEI {
 	public void test() {
 		cpu.reset(0xFF00, mem);
 		CPU copiaCPU = cpu;
-		cpu.C = 1;
+		cpu.C = true;
 		cpu.V = true;
 		cpu.I = 1;
 		cpu.D = 1;
@@ -44,7 +44,7 @@ public class CLC_CLD_CLI_CLV_SEC_SED_SEI {
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
 		if (OPCODE == OPCODES.INS_CLC_IM.opcodeValue) {
-			assertEquals(cpu.C, 0);
+			assertEquals(cpu.C, false);
 
 		} else if (OPCODE == OPCODES.INS_CLD_IM.opcodeValue) {
 			assertEquals(cpu.D, 0);

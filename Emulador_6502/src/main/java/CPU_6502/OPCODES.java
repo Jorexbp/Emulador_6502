@@ -1,5 +1,7 @@
 package CPU_6502;
 
+import Excepciones.Excepcion_Instruccion;
+
 public enum OPCODES {
 
 	// LDA OPCODES
@@ -79,13 +81,13 @@ public enum OPCODES {
 		this.opcodeValue = opVal;
 	}
 
-	public static OPCODES getOPCODE(int val) {
+	public static OPCODES getOPCODE(int val) throws Excepcion_Instruccion {
 		for (OPCODES country : OPCODES.values()) {
 			if (country.opcodeValue == val) {
 				return country;
 			}
 		}
 
-		throw new IllegalArgumentException();
+		throw new Excepcion_Instruccion(Integer.toString(val), 1);
 	}
 }

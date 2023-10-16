@@ -1,4 +1,4 @@
-package STATUS_FLAGS_TESTS;
+package ARIT_TESTS;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class SEC_SED_SEI {
+public class ADC_IM {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -24,44 +24,44 @@ public class SEC_SED_SEI {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-
-		Object[][] data = new Object[][] { { OPCODES.INS_SEI_IM.opcodeValue, 2 }, { OPCODES.INS_SEC_IM.opcodeValue, 2 },
-				{ OPCODES.INS_SED_IM.opcodeValue, 2 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_ADC_AB.opcodeValue, 4 } };
 		return Arrays.asList(data);
 	}
 
 	@Test
 	public void test() {
-		cpu.reset(0xFF00, mem);
-		CPU copiaCPU = cpu;
+		cpu.reset(0xFF00,mem);
+		CPU.A = 0x00;
 		cpu.C = false;
+		cpu.Z = false;
+		cpu.N = true;
+		cpu.V = true;
+		CPU copiaCPU = cpu;
 
-		cpu.I = 0;
-		cpu.D = 0;
-
-		CPU.mem.data[0xFF00] = OPCODE;// Setear los valores correspondientes
-
+		CPU.mem.data[0xFF00] = OPCODE;
+		CPU.mem.data[0xFF01] = 0X00; 
+		CPU.mem.data[0xFF02] = 0x80;
+		CPU.mem.data[0x8000] = 0x00;
+		
+		
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
-		if (OPCODE == OPCODES.INS_SEC_IM.opcodeValue) {
-			assertEquals(cpu.C, true);
-		} else if (OPCODE == OPCODES.INS_SED_IM.opcodeValue) {
-			assertEquals(cpu.D, 1);
-		} else if (OPCODE == OPCODES.INS_SEI_IM.opcodeValue) {
-			assertEquals(cpu.I, 1);
+		if (OPCODES.INS_ADC_AB.opcodeValue == OPCODE) {
+			assertEquals(CPU.A, 0x00);
+			assertEquals(cpu.N, false);
+			assertEquals(cpu.Z, true);
+			assertEquals(cpu.C, false);
+			assertEquals(cpu.V, false);
 		}
-		assertEquals(cpu.N, false);
-		assertEquals(cpu.Z, false);
-		assertEquals(ciclosUsados, CICLOS);
-		assertEquals(cpu.PS, copiaCPU.PS);
+		
 
-		assertEquals(cpu.C, copiaCPU.C);
+		assertEquals(ciclosUsados, CICLOS);
+
+		
 		assertEquals(cpu.I, copiaCPU.I);
 		assertEquals(cpu.D, copiaCPU.D);
 		assertEquals(cpu.B, copiaCPU.B);
 		assertEquals(cpu.V, copiaCPU.V);
-
-		assertEquals(cpu.SP, copiaCPU.SP);
 	}
 
 }
