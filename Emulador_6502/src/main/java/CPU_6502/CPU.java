@@ -27,6 +27,9 @@ public class CPU {
 
 	// Procesor Status
 	public int PS;
+	
+	// Suma
+	public int suma = 0;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -74,8 +77,6 @@ public class CPU {
 	}
 
 	private void ADCSetStatus() {
-		// V = ();
-		C = V ? true : false;
 		Z = (A == 0);
 		N = (A & 0b1000000) > 0;
 		ProcesorStatus();
@@ -828,12 +829,22 @@ public class CPU {
 				case INS_ADC_AB: {
 					int addr = FetchWord(CPU.ciclos, CPU.mem);
 					int oper = readByte(CPU.ciclos, addr, CPU.mem);
-					A += oper;
-					A += C ? 1 : 0; // Probablemente mal
-					N = false;
-					C = false;
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+					
+					A = (suma & 0xFF);
+					Z = (A==0);
+					N = (A & 0b01000000)>0;
+					C = (suma & 0xFF00) > 0;
 					V = false;
-					ADCSetStatus();
+
+					// Arreglar esto
+					if (((oldA & 0b01000000) ^ (oper & 0b01000000)) == 0) {
+						V = (A & 0b01000000) != (oldA & 0b01000000);
+
+					}
 					break;
 				}
 				default:

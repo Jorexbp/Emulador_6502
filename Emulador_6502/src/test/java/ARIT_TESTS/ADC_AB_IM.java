@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ADC_IM {
+public class ADC_AB_IM {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -31,27 +31,28 @@ public class ADC_IM {
 	@Test
 	public void test() {
 		cpu.reset(0xFF00,mem);
-		CPU.A = 0x00;
+		CPU.A = 126;
+		
 		cpu.C = false;
-		cpu.Z = false;
-		cpu.N = true;
-		cpu.V = true;
+		cpu.Z = true;
+		cpu.N = false;
+		cpu.V = false;
 		CPU copiaCPU = cpu;
 
 		CPU.mem.data[0xFF00] = OPCODE;
 		CPU.mem.data[0xFF01] = 0X00; 
 		CPU.mem.data[0xFF02] = 0x80;
-		CPU.mem.data[0x8000] = 0x00;
+		CPU.mem.data[0x8000] = 0x01; // Operando
 		
 		
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
 		if (OPCODES.INS_ADC_AB.opcodeValue == OPCODE) {
-			assertEquals(CPU.A, 0x00);
-			assertEquals(cpu.N, false);
-			assertEquals(cpu.Z, true);
+			assertEquals(cpu.suma, 127);
+			assertEquals(cpu.N, true);
+			assertEquals(cpu.Z, false);
 			assertEquals(cpu.C, false);
-			assertEquals(cpu.V, false);
+			assertEquals(cpu.V, true);
 		}
 		
 
