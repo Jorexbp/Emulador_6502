@@ -52,7 +52,7 @@ public class ADC_AB_IM {
 			assertEquals(cpu.N, true);
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.C, false);
-			assertEquals(cpu.V, true);
+			assertEquals(cpu.V, false);
 		}
 		
 

@@ -27,7 +27,7 @@ public class CPU {
 
 	// Procesor Status
 	public int PS;
-	
+
 	// Suma
 	public int suma = 0;
 
@@ -833,17 +833,18 @@ public class CPU {
 					suma = A;
 					suma += oper;
 					suma += C ? 1 : 0;
-					
+
 					A = (suma & 0xFF);
-					Z = (A==0);
-					N = (A & 0b01000000)>0;
+					Z = (A == 0);
+					N = (A & 0b01000000) > 0;
 					C = (suma & 0xFF00) > 0;
 					V = false;
 
 					// Arreglar esto
-					if (((oldA & 0b01000000) ^ (oper & 0b01000000)) == 0) {
-						V = (A & 0b01000000) != (oldA & 0b01000000);
-
+					if (((oldA ^ suma) & (A ^ suma) & 0x80) > 0) {
+						V = true;
+					} else {
+						V = false;
 					}
 					break;
 				}
