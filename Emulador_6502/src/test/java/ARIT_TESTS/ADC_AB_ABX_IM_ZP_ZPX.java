@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ADC_AB_IM_ZP_ZPX {
+public class ADC_AB_ABX_IM_ZP_ZPX {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -24,7 +24,7 @@ public class ADC_AB_IM_ZP_ZPX {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { OPCODES.INS_ADC_AB.opcodeValue, 4 }, { OPCODES.INS_ADC_IM.opcodeValue, 2 },
+		Object[][] data = new Object[][] { { OPCODES.INS_ADC_AB.opcodeValue, 4 },{ OPCODES.INS_ADC_ABX.opcodeValue, 4 }, { OPCODES.INS_ADC_IM.opcodeValue, 2 },
 				{ OPCODES.INS_ADC_ZP.opcodeValue, 3 }, { OPCODES.INS_ADC_ZPX.opcodeValue, 4 } };
 		return Arrays.asList(data);
 	}
@@ -45,7 +45,9 @@ public class ADC_AB_IM_ZP_ZPX {
 		CPU.mem.data[0xFF02] = 0x80;
 		CPU.mem.data[0x8000] = 0x01; // Operando
 		CPU.mem.data[0x00] = 0x10; // Operando
+		CPU.mem.data[0x8001] = 0x12; // Operando
 		CPU.mem.data[0x01] = 0x12; // Operando
+		
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
 		if (OPCODES.INS_ADC_AB.opcodeValue == OPCODE) {
@@ -67,6 +69,12 @@ public class ADC_AB_IM_ZP_ZPX {
 			assertEquals(cpu.C, false);
 			assertEquals(cpu.V, false);
 		} else if (OPCODES.INS_ADC_ZPX.opcodeValue == OPCODE) {
+			assertEquals(cpu.suma, 144);
+			assertEquals(cpu.N, false);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.C, false);
+			assertEquals(cpu.V, false);
+		} else if (OPCODES.INS_ADC_ABX.opcodeValue == OPCODE) {
 			assertEquals(cpu.suma, 144);
 			assertEquals(cpu.N, false);
 			assertEquals(cpu.Z, false);

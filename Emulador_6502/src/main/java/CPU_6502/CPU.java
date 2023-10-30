@@ -896,14 +896,14 @@ public class CPU {
 					if (effAddrAbsX - addrAbs >= 0xFF) {
 						CPU.ciclos--;
 					}
-
+					
 					int oper = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
-
+					
 					int oldA = A;
 					suma = A;
 					suma += oper;
 					suma += C ? 1 : 0;
-
+					
 					setADCFlags(oldA);
 
 					break;
