@@ -76,11 +76,20 @@ public class CPU {
 
 	}
 
-	private void ADCSetStatus() {
+	private void setADCFlags(int oldA) {
+		A = (suma & 0xFF);
 		Z = (A == 0);
-		N = (A & 0b1000000) > 0;
-		ProcesorStatus();
+		N = (A & 0b01000000) > 0;
+		C = (suma & 0xFF00) > 0;
+		V = false;
 
+		// Arreglar esto
+		if (((oldA ^ suma) & (A ^ suma) & 0x80) > 0) {
+			V = true;
+		} else {
+			V = false;
+		}
+		ProcesorStatus();
 	}
 
 	public void ProcesorStatus() {
@@ -826,6 +835,48 @@ public class CPU {
 					CPU.ciclos--;
 					break;
 				}
+				case INS_ADC_IM: {
+					int oper = FetchByte(CPU.ciclos, CPU.mem);
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+					break;
+				}
+				case INS_ADC_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					int oper = readByte(ciclos, ZeroPageAddr, mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+					break;
+				}
+				case INS_ADC_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					CPU.ciclos--;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					int oper = readByte(ciclos, ZeroPageAddr, mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+					break;
+				}
 				case INS_ADC_AB: {
 					int addr = FetchWord(CPU.ciclos, CPU.mem);
 					int oper = readByte(CPU.ciclos, addr, CPU.mem);
@@ -834,18 +885,27 @@ public class CPU {
 					suma += oper;
 					suma += C ? 1 : 0;
 
-					A = (suma & 0xFF);
-					Z = (A == 0);
-					N = (A & 0b01000000) > 0;
-					C = (suma & 0xFF00) > 0;
-					V = false;
+					setADCFlags(oldA);
 
-					// Arreglar esto
-					if (((oldA ^ suma) & (A ^ suma) & 0x80) > 0) {
-						V = true;
-					} else {
-						V = false;
+					break;
+				}
+				case INS_ADC_ABX: {
+
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
 					}
+
+					int oper = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+
 					break;
 				}
 				default:

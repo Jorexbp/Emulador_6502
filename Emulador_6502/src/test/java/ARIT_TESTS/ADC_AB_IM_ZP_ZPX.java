@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ADC_AB_IM {
+public class ADC_AB_IM_ZP_ZPX {
 	CPU.Mem mem = new CPU.Mem();
 	CPU cpu = new CPU();
 
@@ -24,15 +24,16 @@ public class ADC_AB_IM {
 
 	@Parameterized.Parameters()
 	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { { OPCODES.INS_ADC_AB.opcodeValue, 4 } };
+		Object[][] data = new Object[][] { { OPCODES.INS_ADC_AB.opcodeValue, 4 }, { OPCODES.INS_ADC_IM.opcodeValue, 2 },
+				{ OPCODES.INS_ADC_ZP.opcodeValue, 3 }, { OPCODES.INS_ADC_ZPX.opcodeValue, 4 } };
 		return Arrays.asList(data);
 	}
 
 	@Test
 	public void test() {
-		cpu.reset(0xFF00,mem);
-		CPU.A = 126;
-		
+		cpu.reset(0xFF00, mem);
+		CPU.A = 0x7e; // 126
+		CPU.X = 0x01;
 		cpu.C = false;
 		cpu.Z = true;
 		cpu.N = false;
@@ -40,11 +41,11 @@ public class ADC_AB_IM {
 		CPU copiaCPU = cpu;
 
 		CPU.mem.data[0xFF00] = OPCODE;
-		CPU.mem.data[0xFF01] = 0X00; 
+		CPU.mem.data[0xFF01] = 0X00;
 		CPU.mem.data[0xFF02] = 0x80;
 		CPU.mem.data[0x8000] = 0x01; // Operando
-		
-		
+		CPU.mem.data[0x00] = 0x10; // Operando
+		CPU.mem.data[0x01] = 0x12; // Operando
 		int ciclosUsados = cpu.execute(CICLOS, mem);
 
 		if (OPCODES.INS_ADC_AB.opcodeValue == OPCODE) {
@@ -53,12 +54,28 @@ public class ADC_AB_IM {
 			assertEquals(cpu.Z, false);
 			assertEquals(cpu.C, false);
 			assertEquals(cpu.V, false);
+		} else if (OPCODES.INS_ADC_IM.opcodeValue == OPCODE) {
+			assertEquals(cpu.suma, 126);
+			assertEquals(cpu.N, true);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.C, false);
+			assertEquals(cpu.V, false);
+		} else if (OPCODES.INS_ADC_ZP.opcodeValue == OPCODE) {
+			assertEquals(cpu.suma, 142);
+			assertEquals(cpu.N, false);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.C, false);
+			assertEquals(cpu.V, false);
+		} else if (OPCODES.INS_ADC_ZPX.opcodeValue == OPCODE) {
+			assertEquals(cpu.suma, 144);
+			assertEquals(cpu.N, false);
+			assertEquals(cpu.Z, false);
+			assertEquals(cpu.C, false);
+			assertEquals(cpu.V, false);
 		}
-		
 
 		assertEquals(ciclosUsados, CICLOS);
 
-		
 		assertEquals(cpu.I, copiaCPU.I);
 		assertEquals(cpu.D, copiaCPU.D);
 		assertEquals(cpu.B, copiaCPU.B);
