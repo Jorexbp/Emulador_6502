@@ -896,18 +896,78 @@ public class CPU {
 					if (effAddrAbsX - addrAbs >= 0xFF) {
 						CPU.ciclos--;
 					}
-					
+
 					int oper = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
-					
+
 					int oldA = A;
 					suma = A;
 					suma += oper;
 					suma += C ? 1 : 0;
-					
+
 					setADCFlags(oldA);
 
 					break;
 				}
+				case INS_ADC_ABY: {
+
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsY = addrAbs + Y;
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+
+					int oper = readByte(CPU.ciclos, effAddrAbsY, CPU.mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+
+					break;
+				}
+				case INS_ADC_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+					break;
+				}
+				case INS_ADC_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+					
+					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
+
+					int oldA = A;
+					suma = A;
+					suma += oper;
+					suma += C ? 1 : 0;
+
+					setADCFlags(oldA);
+
+					break;
+				}
+
 				default:
 
 					break;
