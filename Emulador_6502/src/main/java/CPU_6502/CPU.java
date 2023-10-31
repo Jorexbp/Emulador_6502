@@ -133,8 +133,7 @@ public class CPU {
 		CPU.mem = mem;
 		final int ciclosPedidos = ciclos;
 		while (CPU.ciclos > 0) {
-			// System.out.println("Ciclo: "+CPU.ciclos);
-
+			
 			int ins = FetchByte(ciclos, mem);
 			try {
 				switch (OPCODES.getOPCODE(ins)) {
@@ -146,7 +145,6 @@ public class CPU {
 					while (val >= 256) {
 						val -= 256;
 					}
-					// System.out.println(val);
 					A = val;
 					LDASetStatus();
 
@@ -1140,6 +1138,7 @@ public class CPU {
 				case INS_CMP_ZPX: {
 					int ZeroPageAddr = FetchByte(ciclos, mem);
 					ZeroPageAddr += X;
+					CPU.ciclos--;
 					while (ZeroPageAddr >= 256) {
 						ZeroPageAddr -= 256;
 					}
