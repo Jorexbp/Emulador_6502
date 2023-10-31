@@ -5,6 +5,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
 import ARIT_TESTS.ADC_AB_ABX_IM_ZP_ZPX_INX_INY;
+import ARIT_TESTS.SBC_AB_ABX_IM_ZP_ZPX_INX_INY;
 import JSR_RTS_TESTS.JMP_AB_IM;
 import JSR_RTS_TESTS.JSR_RTS;
 import JSR_RTS_TESTS.JSR_STATUSNOAFECTA;
@@ -90,7 +91,7 @@ public class ejecutarTodosLosTests {
 	}
 	
 	public static void ejecutarTestsAritmeticos() {
-		rs = junit.run(ADC_AB_ABX_IM_ZP_ZPX_INX_INY.class);
+		rs = junit.run(ADC_AB_ABX_IM_ZP_ZPX_INX_INY.class,SBC_AB_ABX_IM_ZP_ZPX_INX_INY.class);
 		errores += rs.getFailureCount();
 	}
 
