@@ -29,7 +29,7 @@ public class CPU {
 	public int PS;
 
 	// Suma
-	public int resta = 0,suma = 0;
+	public int resta = 0, suma = 0;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -91,6 +91,7 @@ public class CPU {
 		}
 		ProcesorStatus();
 	}
+
 	private void setSBCFlags(int oldA) {
 		A = (resta & 0xFF);
 		Z = (A == 0);
@@ -105,6 +106,13 @@ public class CPU {
 			V = false;
 		}
 		ProcesorStatus();
+	}
+
+	private void setCMPFlags(int data) {
+		N = (A & 0b1000000) > 0;
+		C = A >= data;
+		Z = A == data;
+
 	}
 
 	public void ProcesorStatus() {
@@ -970,7 +978,7 @@ public class CPU {
 					int effAddr = readWord(ciclos, addrIY, mem);
 					effAddr += Y;
 					CPU.ciclos--;
-					
+
 					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
 
 					int oldA = A;
@@ -987,7 +995,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 					break;
@@ -1002,7 +1010,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 					break;
@@ -1019,7 +1027,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 					break;
@@ -1030,7 +1038,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 
@@ -1049,7 +1057,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 
@@ -1068,7 +1076,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 
@@ -1088,7 +1096,7 @@ public class CPU {
 					int oldA = A;
 					resta = A;
 					resta -= oper;
-					resta -=  (1 - (C ? 1 : 0));
+					resta -= (1 - (C ? 1 : 0));
 
 					setSBCFlags(oldA);
 					break;
@@ -1102,7 +1110,7 @@ public class CPU {
 					int effAddr = readWord(ciclos, addrIY, mem);
 					effAddr += Y;
 					CPU.ciclos--;
-					
+
 					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
 
 					int oldA = A;
@@ -1114,6 +1122,88 @@ public class CPU {
 
 					break;
 				}
+				case INS_CMP_IM: {
+					int data = FetchByte(CPU.ciclos, CPU.mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+
+					int data = readByte(ciclos, ZeroPageAddr, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+
+					int data = readByte(ciclos, ZeroPageAddr, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addrAbs, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_ABX: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					int data = readByte(ciclos, addrAbs, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_ABY: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + Y;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+					int data = readByte(ciclos, effAddrAbsX, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					int data = readByte(ciclos, effAddr, mem);
+					setCMPFlags(data);
+					break;
+				}
+				case INS_CMP_INY:
+				{
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+
+					int data = readByte(ciclos, effAddr, mem);
+					setCMPFlags(data);
+					break;
+				}
+					
+					
 				default:
 
 					break;
