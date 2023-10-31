@@ -29,7 +29,7 @@ public class CPU {
 	public int PS;
 
 	// Suma
-	public int suma = 0;
+	public int resta = 0,suma = 0;
 
 	public CPU() {
 		Mem mem = new Mem();
@@ -85,6 +85,21 @@ public class CPU {
 
 		// Arreglar esto
 		if (((oldA ^ suma) & (A ^ suma) & 0x80) > 0) {
+			V = true;
+		} else {
+			V = false;
+		}
+		ProcesorStatus();
+	}
+	private void setSBCFlags(int oldA) {
+		A = (resta & 0xFF);
+		Z = (A == 0);
+		N = (A & 0b01000000) > 0;
+		C = (resta & 0xFF00) > 0;
+		V = false;
+
+		// Arreglar esto
+		if (((oldA ^ resta) & (A ^ resta) & 0x80) > 0) {
 			V = true;
 		} else {
 			V = false;
@@ -967,7 +982,138 @@ public class CPU {
 
 					break;
 				}
+				case INS_SBC_IM: {
+					int oper = FetchByte(CPU.ciclos, CPU.mem);
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
 
+					setSBCFlags(oldA);
+					break;
+				}
+				case INS_SBC_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					int oper = readByte(ciclos, ZeroPageAddr, mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+					break;
+				}
+				case INS_SBC_ZPX: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					ZeroPageAddr += X;
+					CPU.ciclos--;
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+					int oper = readByte(ciclos, ZeroPageAddr, mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+					break;
+				}
+				case INS_SBC_AB: {
+					int addr = FetchWord(CPU.ciclos, CPU.mem);
+					int oper = readByte(CPU.ciclos, addr, CPU.mem);
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+
+					break;
+				}
+				case INS_SBC_ABX: {
+
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsX = addrAbs + X;
+					if (effAddrAbsX - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+
+					int oper = readByte(CPU.ciclos, effAddrAbsX, CPU.mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+
+					break;
+				}
+				case INS_SBC_ABY: {
+
+					int addrAbs = FetchWord(ciclos, mem);
+					int effAddrAbsY = addrAbs + Y;
+					if (effAddrAbsY - addrAbs >= 0xFF) {
+						CPU.ciclos--;
+					}
+
+					int oper = readByte(CPU.ciclos, effAddrAbsY, CPU.mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+
+					break;
+				}
+				case INS_SBC_INX: {
+					int addrIX = FetchByte(ciclos, mem);
+					addrIX += X;
+					CPU.ciclos--;
+					while (addrIX >= 256) {
+						addrIX -= 256;
+					}
+
+					int effAddr = readWord(ciclos, addrIX, mem);
+					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -=  (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+					break;
+				}
+				case INS_SBC_INY: {
+					int addrIY = FetchByte(ciclos, mem);
+					while (addrIY >= 256) {
+						addrIY -= 256;
+					} // F0
+
+					int effAddr = readWord(ciclos, addrIY, mem);
+					effAddr += Y;
+					CPU.ciclos--;
+					
+					int oper = readByte(CPU.ciclos, effAddr, CPU.mem);
+
+					int oldA = A;
+					resta = A;
+					resta -= oper;
+					resta -= (1 - (C ? 1 : 0));
+
+					setSBCFlags(oldA);
+
+					break;
+				}
 				default:
 
 					break;

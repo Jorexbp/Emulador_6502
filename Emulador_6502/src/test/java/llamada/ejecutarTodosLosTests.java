@@ -4,6 +4,7 @@ import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
+import ARIT_TESTS.ADC_AB_ABX_IM_ZP_ZPX_INX_INY;
 import JSR_RTS_TESTS.JMP_AB_IM;
 import JSR_RTS_TESTS.JSR_RTS;
 import JSR_RTS_TESTS.JSR_STATUSNOAFECTA;
@@ -40,6 +41,7 @@ public class ejecutarTodosLosTests {
 		ejecutarTestsLogicos(); // 4
 		ejecutarTestsST();// 3
 		ejecutarTestsDeStatusFlags();// 2
+		ejecutarTestsAritmeticos();
 		// 19
 
 		if (errores == 0) {
@@ -84,6 +86,11 @@ public class ejecutarTodosLosTests {
 
 	public static void ejecutarTestsDeStatusFlags() {
 		rs = junit.run(CLC_CLD_CLI_CLV_SEC_SED_SEI.class, SEC_SED_SEI.class);
+		errores += rs.getFailureCount();
+	}
+	
+	public static void ejecutarTestsAritmeticos() {
+		rs = junit.run(ADC_AB_ABX_IM_ZP_ZPX_INX_INY.class);
 		errores += rs.getFailureCount();
 	}
 
