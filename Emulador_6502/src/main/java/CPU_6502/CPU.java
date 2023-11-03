@@ -109,9 +109,23 @@ public class CPU {
 	}
 
 	private void setCMPFlags(int data) {
-		N = (A & 0b1000000) > 0;
+		N = ((A - data) & 0b1000000) > 0;
 		C = A >= data;
 		Z = A == data;
+
+	}
+
+	private void setCPXFlags(int data) {
+		N = ((X - data) & 0b1000000) > 0;
+		C = X >= data;
+		Z = X == data;
+
+	}
+
+	private void setCPYFlags(int data) {
+		N = ((Y - data) & 0b1000000) > 0;
+		C = Y >= data;
+		Z = Y == data;
 
 	}
 
@@ -133,7 +147,7 @@ public class CPU {
 		CPU.mem = mem;
 		final int ciclosPedidos = ciclos;
 		while (CPU.ciclos > 0) {
-			
+
 			int ins = FetchByte(ciclos, mem);
 			try {
 				switch (OPCODES.getOPCODE(ins)) {
@@ -1186,8 +1200,7 @@ public class CPU {
 					setCMPFlags(data);
 					break;
 				}
-				case INS_CMP_INY:
-				{
+				case INS_CMP_INY: {
 					int addrIY = FetchByte(ciclos, mem);
 					while (addrIY >= 256) {
 						addrIY -= 256;
@@ -1201,8 +1214,48 @@ public class CPU {
 					setCMPFlags(data);
 					break;
 				}
-					
-					
+				case INS_CPX_IM: {
+					int data = FetchByte(CPU.ciclos, CPU.mem);
+					setCPXFlags(data);
+					break;
+				}
+				case INS_CPX_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+
+					int data = readByte(ciclos, ZeroPageAddr, mem);
+					setCPXFlags(data);
+					break;
+				}
+				case INS_CPX_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addrAbs, mem);
+					setCPXFlags(data);
+					break;
+				}
+				case INS_CPY_IM: {
+					int data = FetchByte(CPU.ciclos, CPU.mem);
+					setCPYFlags(data);
+					break;
+				}
+				case INS_CPY_ZP: {
+					int ZeroPageAddr = FetchByte(ciclos, mem);
+					while (ZeroPageAddr >= 256) {
+						ZeroPageAddr -= 256;
+					}
+
+					int data = readByte(ciclos, ZeroPageAddr, mem);
+					setCPYFlags(data);
+					break;
+				}
+				case INS_CPY_AB: {
+					int addrAbs = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addrAbs, mem);
+					setCPYFlags(data);
+					break;
+				}
 				default:
 
 					break;
