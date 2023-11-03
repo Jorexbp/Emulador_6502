@@ -392,7 +392,7 @@ public class Comando_Opcode {
 			opcode = 0xCA;
 			break;
 		// DEY
-		case "INS_DEy_IP":
+		case "INS_DEY_IP":
 			opcode = 0x88;
 			break;
 
