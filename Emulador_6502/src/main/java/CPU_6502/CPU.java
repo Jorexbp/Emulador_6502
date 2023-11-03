@@ -1353,6 +1353,7 @@ public class CPU {
 				case INS_INC_ZPX: {
 					int ZeroPageAddr = FetchByte(ciclos, mem);
 					ZeroPageAddr += X;
+					CPU.ciclos--;
 					while (ZeroPageAddr >= 256) {
 						ZeroPageAddr -= 256;
 					}
@@ -1377,9 +1378,7 @@ public class CPU {
 				case INS_INC_ABX: {
 					int addrAbs = FetchWord(ciclos, mem);
 					int effAddrAbsX = addrAbs + X;
-					if (effAddrAbsX - addrAbs >= 0xFF) {
-						CPU.ciclos--;
-					}
+					CPU.ciclos--;
 					int data = readByte(ciclos, effAddrAbsX, mem);
 					data++;
 					CPU.ciclos--;
