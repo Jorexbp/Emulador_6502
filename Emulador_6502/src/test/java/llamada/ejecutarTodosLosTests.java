@@ -30,6 +30,7 @@ import STATUS_FLAGS_TESTS.SEC_SED_SEI;
 import ST_GENERIC_TESTS.STA_ZP_ZPX_AB_ABX_ABY_INX_INY;
 import ST_GENERIC_TESTS.STX_ZP_ZPY_AB;
 import ST_GENERIC_TESTS.STY_ZP_ZPX_AB;
+import SYSFUNC_TESTS.BRK_RTI;
 import TAXY_GENERIC_TESTS.TAX_TAY_TXA_TYA;
 
 public class ejecutarTodosLosTests {
@@ -51,7 +52,8 @@ public class ejecutarTodosLosTests {
 		ejecutarTestsAritmeticos(); // 3
 		ejecutarTestsINC_DEC(); // 1
 		ejecutarTestsShifts(); // 4
-		// 27
+		ejecutarTestsSistemaFunc(); // 1
+		// 28
 
 		if (errores == 0) {
 			System.out.println("Ningun test ha fallado");
@@ -112,6 +114,11 @@ public class ejecutarTodosLosTests {
 	public static void ejecutarTestsShifts() {
 		rs = junit.run(ASL_AC_ZP_ZPX_AB_ABX.class, LSR_AC_ZP_ZPX_AB_ABX.class, ROL_AC_ZP_ZPX_AB_ABX.class,
 				ROR_AC_ZP_ZPX_AB_ABX.class);
+		errores += rs.getFailureCount();
+	}
+
+	public static void ejecutarTestsSistemaFunc() {
+		rs = junit.run(BRK_RTI.class);
 		errores += rs.getFailureCount();
 	}
 

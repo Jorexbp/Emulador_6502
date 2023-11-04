@@ -19,7 +19,8 @@ public class CPU {
 
 	// status flags
 
-	public int D, I, B, Un;
+	public int D, I, Un;
+	public boolean B;
 	public boolean C;
 	public boolean V;
 	public boolean N;
@@ -47,7 +48,7 @@ public class CPU {
 		Z = false;
 		I = 0;
 		Un = 0;
-		B = 0;
+		B = false;
 		V = false;
 		N = false;
 		mem = mem2;
@@ -187,13 +188,13 @@ public class CPU {
 	}
 
 	public void ProcesorStatus() {
-		int zbit = (Z == true) ? 1 : 0;
-		int nbit = (N == true) ? 1 : 0;
-		int vbit = (V == true) ? 1 : 0;
-		int cbit = (C == true) ? 1 : 0;
-
+		int zbit = Z ? 1 : 0;
+		int nbit = N ? 1 : 0;
+		int vbit = V ? 1 : 0;
+		int cbit = C ? 1 : 0;
+		int bbit = B ? 1 : 0;
 		String bits = String.valueOf(cbit).concat(String.valueOf(zbit)).concat(String.valueOf(I))
-				.concat(String.valueOf(D)).concat(String.valueOf(B)).concat(String.valueOf(Un))
+				.concat(String.valueOf(D)).concat(String.valueOf(bbit)).concat(String.valueOf(Un))
 				.concat(String.valueOf(vbit)).concat(String.valueOf(nbit));
 		PS = Integer.parseInt(bits, 2);
 		// System.out.println(bits);
@@ -600,12 +601,15 @@ public class CPU {
 				}
 
 				case INS_PLA_IM: { // 4 c
-					A = PopWordFromStack();
+					A = PopByteFromStack();
+					CPU.ciclos--;
 					LDASetStatus();
 					break;
 				}
 				case INS_PLP_IM: { // 3 c
-					PS = PopWordFromStack();
+					PS = PopByteFromStack();
+					CPU.ciclos--;
+
 					break;
 				}
 				case INS_PHP_IM: { // 3 c
@@ -1686,6 +1690,26 @@ public class CPU {
 					break;
 				}
 
+				case INS_BRK_IM: { // 7
+
+					PushPCBRKToStack(ciclos, PC);
+					PushByteToStack(PS);
+					int interrupVector = 0xFFFE;
+					PC = readWord(ciclos, interrupVector, mem);
+					B = true;
+					break;
+				}
+				case INS_RTI_IM: {
+					PS = PopByteFromStack();
+					PC = PopByteFromStack();
+					CPU.ciclos--;
+					break;
+				}
+				case INS_NOP_IM: {
+					PC++;
+					break;
+				}
+
 				default:
 
 					break;
@@ -1729,7 +1753,7 @@ public class CPU {
 		SP++;
 		int addr = SPToAddr();
 		int value = CPU.mem.data[addr];
-		CPU.ciclos -= 3;
+		CPU.ciclos -= 2;
 
 		return value;
 	}
@@ -1739,8 +1763,17 @@ public class CPU {
 	}
 
 	public void PushPCToStack(int ciclos) {
-		writeWord(PC - 1, SPToAddr() - 1, CPU.ciclos);
-		SP -= 2;
+
+		PushPCBRKToStack(ciclos, PC - 1);
+	}
+
+	public void PushPCBRKToStack(int ciclos, int valor) {
+
+		writeByte(valor >> 8, SPToAddr(), ciclos);
+		SP--;
+		writeByte(valor & 0xFF, SPToAddr(), ciclos);
+		SP--;
+
 	}
 
 	public void PushByteToStack(int value) {
