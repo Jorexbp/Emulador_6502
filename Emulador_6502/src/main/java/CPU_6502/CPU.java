@@ -136,10 +136,23 @@ public class CPU {
 
 	}
 
-	private int shiftFlags_shift(int data) {
+	private int aritShiftLeft(int data) {
 
 		C = (data & 0b1000000) > 0;
 		data = data << 1;
+
+		N = (data & 0b1000000) > 0;
+
+		Z = 0 == data;
+		CPU.ciclos--;
+
+		return data;
+	}
+
+	private int logShiftRight(int data) {
+
+		C = (data & 0b00000001) > 0;
+		data = data >> 1;
 
 		N = (data & 0b1000000) > 0;
 
@@ -1400,10 +1413,7 @@ public class CPU {
 					break;
 				}
 				case INS_ASL_AC: {
-					C = (A & 0b1000000) > 0;
-					A = A << 1; // A *= 2;
-					LDASetStatus();
-					CPU.ciclos--;
+					A = aritShiftLeft(A);
 					break;
 				}
 				case INS_ASL_ZP: {
@@ -1412,7 +1422,7 @@ public class CPU {
 						ZPaddr -= 256;
 					}
 					int data = readByte(ciclos, ZPaddr, mem);
-					int dataShift = shiftFlags_shift(data);
+					int dataShift = aritShiftLeft(data);
 
 					writeByte(dataShift, ZPaddr, ciclos);
 
@@ -1426,7 +1436,7 @@ public class CPU {
 						ZPaddr -= 256;
 					}
 					int data = readByte(ciclos, ZPaddr, mem);
-					int dataShift = shiftFlags_shift(data);
+					int dataShift = aritShiftLeft(data);
 
 					writeByte(dataShift, ZPaddr, ciclos);
 
@@ -1435,7 +1445,7 @@ public class CPU {
 				case INS_ASL_AB: {
 					int addr = FetchWord(ciclos, mem);
 					int data = readByte(ciclos, addr, mem);
-					int dataShift = shiftFlags_shift(data);
+					int dataShift = aritShiftLeft(data);
 
 					writeByte(dataShift, addr, ciclos);
 
@@ -1446,13 +1456,63 @@ public class CPU {
 					addr += X;
 					CPU.ciclos--;
 					int data = readByte(ciclos, addr, mem);
-					int dataShift = shiftFlags_shift(data);
+					int dataShift = aritShiftLeft(data);
 
 					writeByte(dataShift, addr, ciclos);
 
 					break;
 				}
+				case INS_LSR_AC: {
+					A = logShiftRight(A);
 
+					break;
+				}
+				case INS_LSR_ZP: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = logShiftRight(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_LSR_ZPX: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					ZPaddr += X;
+					CPU.ciclos--;
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = logShiftRight(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_LSR_AB: {
+					int addr = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = logShiftRight(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
+				case INS_LSR_ABX: {
+					int addr = FetchWord(ciclos, mem);
+					addr += X;
+					CPU.ciclos--;
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = logShiftRight(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
 				default:
 
 					break;

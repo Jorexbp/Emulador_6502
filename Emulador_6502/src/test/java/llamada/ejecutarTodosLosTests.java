@@ -19,6 +19,7 @@ import LOGICAL_GENERIC_TESTS.AND_IM_ZP_ZPX_AB_INX_INY;
 import LOGICAL_GENERIC_TESTS.BIT_ZP_AB;
 import LOGICAL_GENERIC_TESTS.ORA_IM_ZP_ZPX_AB_ABX_ABY_INX_INY;
 import LOGICAL_GENERIC_TESTS.XOR_IM_ZP_ZPX_AB_ABX_ABY_INX_INY;
+import SHIFT_TESTS.ASL_AC_ZP_ZPX_AB_ABX;
 import STACK_OPERATIONS_TESTS.PHP_TESTS;
 import STACK_OPERATIONS_TESTS.TSX_TXS_PHA_PLA_PLP;
 import STATUS_FLAGS_TESTS.CLC_CLD_CLI_CLV_SEC_SED_SEI;
@@ -46,6 +47,7 @@ public class ejecutarTodosLosTests {
 		ejecutarTestsDeStatusFlags();// 2
 		ejecutarTestsAritmeticos();
 		ejecutarTestsINC_DEC();
+		ejecutarTestsShifts();
 		// 19
 
 		if (errores == 0) {
@@ -101,6 +103,11 @@ public class ejecutarTodosLosTests {
 
 	public static void ejecutarTestsINC_DEC() {
 		rs = junit.run(INC_ZP_ZPX_AB_ABX.class);
+		errores += rs.getFailureCount();
+	}
+
+	public static void ejecutarTestsShifts() {
+		rs = junit.run(ASL_AC_ZP_ZPX_AB_ABX.class);
 		errores += rs.getFailureCount();
 	}
 
