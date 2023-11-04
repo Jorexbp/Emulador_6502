@@ -20,6 +20,9 @@ import LOGICAL_GENERIC_TESTS.BIT_ZP_AB;
 import LOGICAL_GENERIC_TESTS.ORA_IM_ZP_ZPX_AB_ABX_ABY_INX_INY;
 import LOGICAL_GENERIC_TESTS.XOR_IM_ZP_ZPX_AB_ABX_ABY_INX_INY;
 import SHIFT_TESTS.ASL_AC_ZP_ZPX_AB_ABX;
+import SHIFT_TESTS.LSR_AC_ZP_ZPX_AB_ABX;
+import SHIFT_TESTS.ROL_AC_ZP_ZPX_AB_ABX;
+import SHIFT_TESTS.ROR_AC_ZP_ZPX_AB_ABX;
 import STACK_OPERATIONS_TESTS.PHP_TESTS;
 import STACK_OPERATIONS_TESTS.TSX_TXS_PHA_PLA_PLP;
 import STATUS_FLAGS_TESTS.CLC_CLD_CLI_CLV_SEC_SED_SEI;
@@ -45,10 +48,10 @@ public class ejecutarTodosLosTests {
 		ejecutarTestsLogicos(); // 4
 		ejecutarTestsST();// 3
 		ejecutarTestsDeStatusFlags();// 2
-		ejecutarTestsAritmeticos();
-		ejecutarTestsINC_DEC();
-		ejecutarTestsShifts();
-		// 19
+		ejecutarTestsAritmeticos(); // 3
+		ejecutarTestsINC_DEC(); // 1
+		ejecutarTestsShifts(); // 4
+		// 27
 
 		if (errores == 0) {
 			System.out.println("Ningun test ha fallado");
@@ -107,7 +110,8 @@ public class ejecutarTodosLosTests {
 	}
 
 	public static void ejecutarTestsShifts() {
-		rs = junit.run(ASL_AC_ZP_ZPX_AB_ABX.class);
+		rs = junit.run(ASL_AC_ZP_ZPX_AB_ABX.class, LSR_AC_ZP_ZPX_AB_ABX.class, ROL_AC_ZP_ZPX_AB_ABX.class,
+				ROR_AC_ZP_ZPX_AB_ABX.class);
 		errores += rs.getFailureCount();
 	}
 

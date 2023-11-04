@@ -174,6 +174,18 @@ public class CPU {
 		return data;
 	}
 
+	private int ROR(int data) {
+		int bit1 = C ? 0b0000001 : 0;
+		C = (data & 0b10000000) > 0;
+		data = data >> 1;
+		data |= bit1; // bitwise OR y asigna
+		N = (data & 0b1000000) > 0;
+
+		Z = 0 == data;
+		CPU.ciclos--;
+		return data;
+	}
+
 	public void ProcesorStatus() {
 		int zbit = (Z == true) ? 1 : 0;
 		int nbit = (N == true) ? 1 : 0;
@@ -1570,6 +1582,56 @@ public class CPU {
 					CPU.ciclos--;
 					int data = readByte(ciclos, addr, mem);
 					int dataShift = ROL(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
+				case INS_ROR_AC: {
+					A = ROR(A);
+					break;
+				}
+				case INS_ROR_ZP: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = ROR(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_ROR_ZPX: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					ZPaddr += X;
+					CPU.ciclos--;
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = ROR(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_ROR_AB: {
+					int addr = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = ROR(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
+				case INS_ROR_ABX: {
+					int addr = FetchWord(ciclos, mem);
+					addr += X;
+					CPU.ciclos--;
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = ROR(data);
 
 					writeByte(dataShift, addr, ciclos);
 
