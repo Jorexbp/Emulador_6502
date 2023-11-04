@@ -199,6 +199,20 @@ public class CPU {
 		// System.out.println(bits);
 	}
 
+	private void branchear_Si(boolean comp, boolean esperado) {
+		int offset = FetchByte(ciclos, mem);
+		if (comp == esperado) {
+			int PC_old = PC;
+			PC += offset;
+			CPU.ciclos--;
+
+			boolean cambioPagina = (PC >> 8) != (PC_old >> 8);
+			if (cambioPagina) {
+				CPU.ciclos -= 2;
+			}
+		}
+	}
+
 	public int execute(int ciclos, Mem mem) {
 		CPU.ciclos = ciclos;
 		CPU.mem = mem;
@@ -1635,6 +1649,40 @@ public class CPU {
 
 					writeByte(dataShift, addr, ciclos);
 
+					break;
+				}
+				case INS_BCC_RL: {
+					branchear_Si(C, false);
+					break;
+				}
+				case INS_BCS_RL: {
+					branchear_Si(C, true);
+					break;
+				}
+				case INS_BEQ_RL: {
+					branchear_Si(Z, true);
+					break;
+				}
+				case INS_BNE_RL: {
+					branchear_Si(Z, false);
+					break;
+				}
+
+				case INS_BMI_RL: {
+					branchear_Si(N, true);
+					break;
+				}
+				case INS_BPL_RL: {
+					branchear_Si(Z, false);
+					break;
+				}
+
+				case INS_BVS_RL: {
+					branchear_Si(V, true);
+					break;
+				}
+				case INS_BVC_RL: {
+					branchear_Si(Z, false);
 					break;
 				}
 
