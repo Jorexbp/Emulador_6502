@@ -136,6 +136,19 @@ public class CPU {
 
 	}
 
+	private int shiftFlags_shift(int data) {
+
+		C = (data & 0b1000000) > 0;
+		data = data << 1;
+
+		N = (data & 0b1000000) > 0;
+
+		Z = 0 == data;
+		CPU.ciclos--;
+
+		return data;
+	}
+
 	public void ProcesorStatus() {
 		int zbit = (Z == true) ? 1 : 0;
 		int nbit = (N == true) ? 1 : 0;
@@ -1305,7 +1318,7 @@ public class CPU {
 					int addrAbs = FetchWord(ciclos, mem);
 					int effAddrAbsX = addrAbs + X;
 					CPU.ciclos--;
-					
+
 					int data = readByte(ciclos, effAddrAbsX, mem);
 					data--;
 					CPU.ciclos--;
@@ -1386,6 +1399,60 @@ public class CPU {
 					setResultFlags(data);
 					break;
 				}
+				case INS_ASL_AC: {
+					C = (A & 0b1000000) > 0;
+					A = A << 1; // A *= 2;
+					LDASetStatus();
+					CPU.ciclos--;
+					break;
+				}
+				case INS_ASL_ZP: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = shiftFlags_shift(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_ASL_ZPX: {
+					int ZPaddr = FetchByte(ciclos, mem);
+					ZPaddr += X;
+					CPU.ciclos--;
+					while (ZPaddr >= 256) {
+						ZPaddr -= 256;
+					}
+					int data = readByte(ciclos, ZPaddr, mem);
+					int dataShift = shiftFlags_shift(data);
+
+					writeByte(dataShift, ZPaddr, ciclos);
+
+					break;
+				}
+				case INS_ASL_AB: {
+					int addr = FetchWord(ciclos, mem);
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = shiftFlags_shift(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
+				case INS_ASL_ABX: {
+					int addr = FetchWord(ciclos, mem);
+					addr += X;
+					CPU.ciclos--;
+					int data = readByte(ciclos, addr, mem);
+					int dataShift = shiftFlags_shift(data);
+
+					writeByte(dataShift, addr, ciclos);
+
+					break;
+				}
+
 				default:
 
 					break;
