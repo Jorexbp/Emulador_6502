@@ -11,7 +11,10 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import com.sun.tools.javac.launcher.Main;
+
 import CPU_6502.CPU;
+import CPU_6502.CPU.Mem;
 import CPU_6502.Comando_Opcode;
 import CPU_6502.OPCODES;
 
@@ -24,6 +27,7 @@ import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Visual_CPU6502 extends JFrame {
@@ -73,14 +77,14 @@ public class Visual_CPU6502 extends JFrame {
 		int cont = 0;
 		int m = 0;
 		for (OPCODES string : OPCODES.values()) {
-			if(cont == 20) {
+			if (cont == 20) {
 				val += string.toString() + "\n";
-				cont = 0;	
-			}else {
+				cont = 0;
+			} else {
 				val += string.toString() + "\t";
-				
+
 			}
-			
+
 			cont++;
 			m++;
 		}
@@ -134,7 +138,7 @@ public class Visual_CPU6502 extends JFrame {
 	}
 
 	private String[] cargarComandosPredefinidos() {
-		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET" };
+		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET", "TEST" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
@@ -149,46 +153,55 @@ public class Visual_CPU6502 extends JFrame {
 		while (st.hasMoreTokens()) { // No funciona con un For
 			valores.add(st.nextToken());
 		}
+		try {
 
-		comando = valores.get(0).trim().toUpperCase();
+			comando = valores.get(0).trim().toUpperCase();
 
-		for (OPCODES ins : OPCODES.values()) {
-			if (comando.equals(ins.toString())) {
-				existe = true;
-			}
-		}
-		int opcode = Comando_Opcode.cambiarAOpcode(comando);
-
-		int cont = 1;
-		if (existe && opcode != -1) {
-			try {
-				resetCPU();
-				CPU.mem.data[0xFF01] = opcode;
-				CPU.mem.data[0xFF02] = Integer.parseInt(valores.get(cont));
-				cont++;
-				try {
-					CPU.mem.data[CPU.mem.data[0xFF02]] = Integer.parseInt(valores.get(cont));
-				} catch (Exception e) {
-
+			for (OPCODES ins : OPCODES.values()) {
+				if (comando.equals(ins.toString())) {
+					existe = true;
 				}
-				cpu.execute(2, CPU.mem);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				cont--;
-				textArea.append("VALORES NO VALIDOS: \"" + (valores.get(cont)).trim() + "\"\nUsuario > ");
 			}
-		} else {
-			if (comando.equals("N") && pregunta == 1) {
+			int i = 0;
 
-				textArea.append("\nUsuario > ");
+			if (existe) {
+				try {
+					CPU cpu = new CPU();
+					Mem mem = new Mem();
+					cpu.reset(0x0FFF, mem);
+
+					int[] Programa = new int[valores.size() + 2];
+					Programa[0] = 0x00;
+					Programa[1] = 0x10;
+					Programa[2] = Comando_Opcode.cambiarAOpcode(comando);
+
+					for (i = 3; i < Programa.length; i++) {
+
+						if (Comando_Opcode.cambiarAOpcode(valores.get(i - 2)) == -1) {
+							Programa[i] = Integer.parseInt(valores.get(i - 2));
+						} else {
+							Programa[i] = Comando_Opcode.cambiarAOpcode(valores.get(i - 2));
+						}
+					}
+					int iniPrg = cpu.CargarPrograma(Programa, Programa.length, mem);
+					cpu.PC = iniPrg;
+					for (int Reloj = Programa.length; Reloj > 0;) {
+						Reloj -= cpu.execute(1, mem);
+						// cpu.EstadoPrograma();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					textArea.append("\nVALORES NO VALIDOS");
+				} finally {
+					textArea.append("\nUsuario > ");
+				}
 			} else {
-				textArea.append("COMANDO NO ENCONTRADO: \"" + comando + "\"\n");
-				textArea.append("Usuario > ");
+				textArea.append("COMANDO \"" + valores.get(i) + "\" NO ENCONTRADO\nUsuario > ");
 			}
+			cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
+		} catch (Exception e) {
+			textArea.append("COMANDO \"" + valores.get(0) + "\" NO ENCONTRADO\nUsuario > ");
 		}
-		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
-
 	}
 
 	private void valorarComandoPredefinido(String comando) {
@@ -219,6 +232,7 @@ public class Visual_CPU6502 extends JFrame {
 		case "RESET":
 			resetCPU();
 			break;
+
 		default:
 			break;
 		}

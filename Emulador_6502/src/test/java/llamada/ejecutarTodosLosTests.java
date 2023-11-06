@@ -33,7 +33,7 @@ import ST_GENERIC_TESTS.STY_ZP_ZPX_AB;
 import SYSFUNC_TESTS.BRK_RTI;
 import TAXY_GENERIC_TESTS.TAX_TAY_TXA_TYA;
 
-public class ejecutarTodosLosTests {
+class ejecutarTodosLosTests {
 	static JUnitCore junit = new JUnitCore();
 
 	static Result rs;

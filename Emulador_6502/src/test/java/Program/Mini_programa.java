@@ -15,7 +15,7 @@ public class Mini_programa {
 				0x8D, 0x00, 0x80, 0x49, 0xCC, 0x4C, 0x02, 0x10
 				};
 		
-		int iniPrg = cpu.CargarPrograma(Prg,14,mem);
+		int iniPrg = cpu.CargarPrograma(Prg,Prg.length,mem);
 		cpu.PC = iniPrg;
 		
 		assertEquals(CPU.mem.data[0x0FFF], 0x0);

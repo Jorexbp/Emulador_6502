@@ -1,5 +1,7 @@
 package CPU_6502;
 
+import java.util.Iterator;
+
 import Excepciones.Excepcion_Instruccion;
 
 public class CPU {
@@ -221,6 +223,7 @@ public class CPU {
 		while (CPU.ciclos > 0) {
 
 			int ins = FetchByte(ciclos, mem);
+			// System.out.println(ins);
 			try {
 				switch (OPCODES.getOPCODE(ins)) {
 
@@ -1819,13 +1822,14 @@ public class CPU {
 
 	public int CargarPrograma(int[] Prg, int nBytes, Mem mem) {
 		int addr = -1;
-		if (Prg.length > 0 && nBytes > 2) {
+		if (Prg.length > 0 && nBytes >= 2) {
 			int At = 0;
 			int lo = Prg[At++];
 			int hi = Prg[At++] << 8;
 			addr = lo | hi;
 			for (int i = addr; i < addr + nBytes - 2; i++) {
 				CPU.mem.data[i] = Prg[At++];
+			//	System.out.println("Memoria: " + CPU.mem.data[i]);
 			}
 		}
 		return addr;
