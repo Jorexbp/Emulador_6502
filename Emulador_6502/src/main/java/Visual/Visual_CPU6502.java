@@ -74,18 +74,12 @@ public class Visual_CPU6502 extends JFrame {
 
 	public void MostrarIns() {
 		String val = "\n";
-		int cont = 0;
 		int m = 0;
 		for (OPCODES string : OPCODES.values()) {
-			if (cont == 20) {
-				val += string.toString() + "\n";
-				cont = 0;
-			} else {
-				val += string.toString() + "\t";
+			val += string.toString() + "\n";
 
-			}
+			val += string.toString() + "\t";
 
-			cont++;
 			m++;
 		}
 		textArea.append(val + "\nCOMANDOS TOTALES: " + m + "\nUsuario > ");
@@ -138,11 +132,20 @@ public class Visual_CPU6502 extends JFrame {
 	}
 
 	private String[] cargarComandosPredefinidos() {
-		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET", "TEST" };
+		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET", "OPCODES" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
 		return comandos;
+	}
+
+	private void MostrarOpcodes() {
+
+		for (OPCODES string : OPCODES.values()) {
+			textArea.append(string.toString() + ": " + string.opcodeValue + "\n");
+		}
+		textArea.append("\nUsuario > ");
+
 	}
 
 	private void EjecutarComando(String valoresComas) {
@@ -231,6 +234,9 @@ public class Visual_CPU6502 extends JFrame {
 			break;
 		case "RESET":
 			resetCPU();
+			break;
+		case "OPCODES":
+			MostrarOpcodes();
 			break;
 
 		default:
