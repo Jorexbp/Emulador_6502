@@ -396,6 +396,111 @@ public class Comando_Opcode {
 			opcode = 0x88;
 			break;
 
+		// SHIFTS
+		// ASL
+		case "INS_ASL_AC":
+			opcode = 0x0A;
+			break;
+		case "INS_ASL_ZP":
+			opcode = 0x06;
+			break;
+		case "INS_ASL_ZPX":
+			opcode = 0x16;
+			break;
+		case "INS_ASL_AB":
+			opcode = 0x0E;
+			break;
+		case "INS_ASL_ABX":
+			opcode = 0x1E;
+			break;
+		// LSR
+		case "INS_LSR_AC":
+			opcode = 0x4A;
+			break;
+		case "INS_LSR_ZP":
+			opcode = 0x46;
+			break;
+		case "INS_LSR_ZPX":
+			opcode = 0x56;
+			break;
+		case "INS_LSR_AB":
+			opcode = 0x4E;
+			break;
+		case "INS_LSR_ABX":
+			opcode = 0x5E;
+			break;
+
+		// ROL
+		case "INS_ROL_AC":
+			opcode = 0x2A;
+			break;
+		case "INS_ROL_ZP":
+			opcode = 0x26;
+			break;
+		case "INS_ROL_ZPX":
+			opcode = 0x36;
+			break;
+		case "INS_ROL_AB":
+			opcode = 0x2E;
+			break;
+		case "INS_ROL_ABX":
+			opcode = 0x3E;
+			break;
+		// ROR
+		case "INS_ROR_AC":
+			opcode = 0x6A;
+			break;
+		case "INS_ROR_ZP":
+			opcode = 0x66;
+			break;
+		case "INS_ROR_ZPX":
+			opcode = 0x76;
+			break;
+		case "INS_ROR_AB":
+			opcode = 0x26E;
+			break;
+		case "INS_ROR_ABX":
+			opcode = 0x7E;
+			break;
+
+		// BRANCHES
+		case "INS_BCC_RL":
+			opcode = 0x90;
+			break;
+		case "INS_BCS_RL":
+			opcode = 0xB0;
+			break;
+		case "INS_BEW_RL":
+			opcode = 0xF0;
+			break;
+		case "INS_BMI_RL":
+			opcode = 0x30;
+			break;
+		case "INS_BNE_RL":
+			opcode = 0xD0;
+			break;
+		case "INS_BPL_RL":
+			opcode = 0x10;
+			break;
+		case "INS_BVC_RL":
+			opcode = 0x50;
+			break;
+		case "INS_BVS_RL":
+			opcode = 0x70;
+			break;
+
+		// SYS FUNCS
+
+		case "INS_BRK_IM":
+			opcode = 0x00;
+			break;
+		case "INS_NOP_IM":
+			opcode = 0xEA;
+			break;
+		case "INS_RTI_IM":
+			opcode = 0x40;
+			break;
+
 		default:
 			opcode = -1;
 			break;
