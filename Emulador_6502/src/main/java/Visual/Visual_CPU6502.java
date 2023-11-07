@@ -11,8 +11,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
-import com.sun.tools.javac.launcher.Main;
-
 import CPU_6502.CPU;
 import CPU_6502.CPU.Mem;
 import CPU_6502.Comando_Opcode;
@@ -36,15 +34,16 @@ public class Visual_CPU6502 extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private CPU cpu = new CPU();
 	private JPanel contentPane;
 	private JScrollPane scrollPane;
 	private static JTextArea textArea;
 	private String command = "", comando = "";
 	private ArrayList<String> historial = new ArrayList<>();
 	private ArrayList<String> comandosPredefinidos = new ArrayList<>();
-	private int n_comando, pregunta = 0;
+	private int n_comando;
 	private static int cortr;
+	private CPU cpu = new CPU();
+	private Mem mem = new Mem();
 
 	/**
 	 * Launch the application.
@@ -85,11 +84,25 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append(val + "\nCOMANDOS TOTALES: " + m + "\nUsuario > ");
 	}
 
-	private void resetCPU() {
-		cpu.reset(0xFF01, CPU.mem);
+	private void resetCPU(String comando) {
+		String val[] = comando.split(",");
+
+		try {
+			if (val.length == 2) {
+				cpu.reset(Integer.parseInt(val[1]), mem);
+
+			} else {
+				cpu.reset(0x0FFF, mem);
+
+			}
+		} catch (Exception e) {
+			textArea.append("ERROR: " + val[1] + " NO ES UN VECTOR VALIDO");
+
+		}
 		textArea.append("\nUsuario > ");
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 		textArea.setCaretPosition(cortr);
+
 	}
 
 	private void mostrarComandosPredefinidos() {
@@ -101,19 +114,42 @@ public class Visual_CPU6502 extends JFrame {
 		textArea.append("\n\nUsuario > ");
 	}
 
+	private String CambioBinario(String numPar) throws Exception {
+		String temp = "";
+
+		int num = Integer.parseInt(numPar.split(",")[1]);
+		String binario = Integer.toString(num, 2);
+		while (temp.length() < (8 - binario.length())) {
+			temp += "0";
+		}
+		temp += binario;
+
+		return temp;
+	}
+
 	public void MostrarPorConsola() {
-		textArea.append("\n//////////////////////////////////\nValor del registro A: " + CPU.A + "\n");
-		textArea.append("Valor del registro X: " + CPU.X + "\n");
-		textArea.append("Valor del registro Y: " + CPU.Y + "\n");
+		try {
+			textArea.append("\n//////////////////////////////////\n");
+			textArea.append("VALOR DEL PC: " + cpu.PC);
+			textArea.append("\nVALOR DEL PS: " + cpu.PS);
+			textArea.append("\nVALOR DEL PS (BIN): " + CambioBinario("null,"+Integer.toString(cpu.PS)));
 
-		textArea.append("Valor de la bandera D: " + cpu.D + "\n");
-		textArea.append("Valor de la bandera C: " + cpu.C + "\n");
-		textArea.append("Valor de la bandera I: " + cpu.I + "\n");
-		textArea.append("Valor de la bandera B: " + cpu.B + "\n");
-		textArea.append("Valor de la bandera V: " + cpu.V + "\n");
+			textArea.append("\nValor del registro A: " + CPU.A + "\n");
+			textArea.append("Valor del registro X: " + CPU.X + "\n");
+			textArea.append("Valor del registro Y: " + CPU.Y + "\n");
 
-		textArea.append("Valor de la bandera N: " + cpu.N + "\n");
-		textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\nUsuario > ");
+			textArea.append("Valor de la bandera D: " + cpu.D + "\n");
+			textArea.append("Valor de la bandera C: " + cpu.C + "\n");
+			textArea.append("Valor de la bandera I: " + cpu.I + "\n");
+			textArea.append("Valor de la bandera B: " + cpu.B + "\n");
+			textArea.append("Valor de la bandera V: " + cpu.V + "\n");
+
+			textArea.append("Valor de la bandera N: " + cpu.N + "\n");
+			textArea.append("Valor de la bandera Z: " + cpu.Z + "\n//////////////////////////////////\n\nUsuario > ");
+		} catch (Exception e) {
+			textArea.append("VALOR A BINARIO NO VALIDO\nUsuario > ");
+
+		}
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 		textArea.setCaretPosition(cortr + comando.length());
 	}
@@ -132,7 +168,7 @@ public class Visual_CPU6502 extends JFrame {
 	}
 
 	private String[] cargarComandosPredefinidos() {
-		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET", "OPCODES" };
+		String comandos[] = { "HELP", "EXIT", "SHOW", "SHOWMEM", "SHOWINS", "CLEAR", "CL", "RESET", "OPCODES", "BIN" };
 		for (int i = 0; i < comandos.length; i++) {
 			comandosPredefinidos.add(comandos[i]);
 		}
@@ -169,9 +205,6 @@ public class Visual_CPU6502 extends JFrame {
 
 			if (existe) {
 				try {
-					CPU cpu = new CPU();
-					Mem mem = new Mem();
-					cpu.reset(0x0FFF, mem);
 
 					int[] Programa = new int[valores.size() + 2];
 					Programa[0] = 0x00;
@@ -193,7 +226,6 @@ public class Visual_CPU6502 extends JFrame {
 						// cpu.EstadoPrograma();
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
 					textArea.append("\nVALORES NO VALIDOS");
 				} finally {
 					textArea.append("\nUsuario > ");
@@ -208,7 +240,8 @@ public class Visual_CPU6502 extends JFrame {
 	}
 
 	private void valorarComandoPredefinido(String comando) {
-		switch (comando.toUpperCase()) {
+
+		switch (comando.toUpperCase().split(",")[0]) {
 		case "HELP":
 			mostrarComandosPredefinidos();
 			break;
@@ -233,12 +266,21 @@ public class Visual_CPU6502 extends JFrame {
 			MostrarIns();
 			break;
 		case "RESET":
-			resetCPU();
+			resetCPU(comando);
 			break;
 		case "OPCODES":
 			MostrarOpcodes();
 			break;
-
+		case "BIN":
+			try {
+				textArea.append("VALOR EN BINARIO DE: "+comando.split(",")[1]+" ES --> "+CambioBinario(comando));
+				textArea.append("\nUsuario > ");
+				
+			} catch (Exception e) {
+				textArea.append("VALOR A BINARIO NO VALIDO\nUsuario > ");
+				
+			}
+			break;
 		default:
 			break;
 		}
@@ -303,8 +345,9 @@ public class Visual_CPU6502 extends JFrame {
 				cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 				String valoresComas = "";
 				command = textArea.getText().substring(cortr).trim().toUpperCase();
+
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (comandosPredefinidos.contains(command)) {
+					if (comandosPredefinidos.contains(command.split(",")[0])) {
 						valorarComandoPredefinido(command);
 					} else if (textArea.getText().substring(cortr).trim().isEmpty()) {
 						textArea.append("Usuario > ");
@@ -315,6 +358,7 @@ public class Visual_CPU6502 extends JFrame {
 						historial.add(command.trim());
 						n_comando = 0;
 					}
+
 				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 					try {
 						textArea.append(historial.get(historial.size() - 1).toString());
@@ -344,6 +388,6 @@ public class Visual_CPU6502 extends JFrame {
 		cortr = textArea.getText().lastIndexOf("Usuario > ") + 10;
 
 		textArea.setCaretPosition(cortr);
-
+		cpu.reset(0x0FFF, mem);
 	}
 }

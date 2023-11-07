@@ -29,7 +29,7 @@ public class CPU {
 	public boolean Z;
 
 	// Procesor Status
-	public int PS;
+	public int PS = 0;
 
 	// Suma
 	public int resta = 0, suma = 0;
